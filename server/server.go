@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fiufit/trainings/database"
 	"github.com/fiufit/trainings/handlers"
+	"github.com/fiufit/trainings/models"
+	"github.com/fiufit/trainings/repositories"
+	"github.com/fiufit/trainings/usecases"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -23,14 +27,26 @@ func (s *Server) Run() {
 }
 
 func NewServer() *Server {
+	db, err := database.NewPostgresDBClient()
+	if err != nil {
+		panic(err)
+	}
+
+	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{})
+	if err != nil {
+		panic(err)
+	}
+
 	logger, _ := zap.NewDevelopment()
 
 	// REPOSITORIES
+	trainingRepo := repositories.NewTrainingRepository(db, logger)
 
 	// USECASES
+	trainingUc := usecases.NewTrainingCreatorImpl(trainingRepo, logger)
 
 	// HANDLERS
-	createTraining := handlers.NewCreateTraining(logger)
+	createTraining := handlers.NewCreateTraining(&trainingUc, logger)
 	getTrainings := handlers.NewGetTrainings(logger)
 
 	return &Server{

@@ -45,13 +45,6 @@ func TestCreateTrainingOk(t *testing.T) {
 func TestCreateTrainingError(t *testing.T) {
 
 	ctx := context.Background()
-	creationDate := time.Now()
-	_, err := mpatch.PatchMethod(time.Now, func() time.Time {
-		return creationDate
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
 	req := training.CreateTrainingRequest{
 		Name:        "Test Name",
 		Description: "Test Description",

@@ -66,9 +66,12 @@ func TestConvertToExercisesOk(t *testing.T) {
 
 func TestConverToTrainingPlanOk(t *testing.T) {
 	creationDate := time.Now()
-	mpatch.PatchMethod(time.Now, func() time.Time {
+	_, err := mpatch.PatchMethod(time.Now, func() time.Time {
 		return creationDate
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	req1 := ExerciseRequest{
 		Title:       "Test exercise 1",

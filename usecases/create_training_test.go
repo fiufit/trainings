@@ -18,9 +18,12 @@ func TestCreateTrainingOk(t *testing.T) {
 
 	ctx := context.Background()
 	creationDate := time.Now()
-	mpatch.PatchMethod(time.Now, func() time.Time {
+	_, err := mpatch.PatchMethod(time.Now, func() time.Time {
 		return creationDate
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	req := training.CreateTrainingRequest{
 		Name:        "Test Name",
 		Description: "Test Description",
@@ -43,9 +46,12 @@ func TestCreateTrainingError(t *testing.T) {
 
 	ctx := context.Background()
 	creationDate := time.Now()
-	mpatch.PatchMethod(time.Now, func() time.Time {
+	_, err := mpatch.PatchMethod(time.Now, func() time.Time {
 		return creationDate
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	req := training.CreateTrainingRequest{
 		Name:        "Test Name",
 		Description: "Test Description",

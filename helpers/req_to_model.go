@@ -7,7 +7,7 @@ import (
 	"github.com/fiufit/trainings/models"
 )
 
-func convertToExercise(exerciseReq training.ExerciseRequest) models.Exercise {
+func ConvertToExercise(exerciseReq training.ExerciseRequest) models.Exercise {
 	return models.Exercise{
 		Title:          exerciseReq.Title,
 		Description:    exerciseReq.Description,
@@ -17,15 +17,15 @@ func convertToExercise(exerciseReq training.ExerciseRequest) models.Exercise {
 	}
 }
 
-func convertToExercises(exerciseReqs []training.ExerciseRequest) []models.Exercise {
+func ConvertToExercises(exerciseReqs []training.ExerciseRequest) []models.Exercise {
 	exercises := make([]models.Exercise, len(exerciseReqs))
 	for i, exerciseReq := range exerciseReqs {
-		exercises[i] = convertToExercise(exerciseReq)
+		exercises[i] = ConvertToExercise(exerciseReq)
 	}
 	return exercises
 }
 
-func converToTrainingPlan(trainingReq training.CreateTrainingRequest, exercises []models.Exercise) models.TrainingPlan {
+func ConverToTrainingPlan(trainingReq training.CreateTrainingRequest, exercises []models.Exercise) models.TrainingPlan {
 	return models.TrainingPlan{
 		Name:        trainingReq.Name,
 		Description: trainingReq.Description,

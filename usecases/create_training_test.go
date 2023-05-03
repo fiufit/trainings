@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/helpers"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories/mocks"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +29,7 @@ func TestCreateTrainingOk(t *testing.T) {
 	}
 	trainingRepo := new(mocks.TrainingPlans)
 
-	training := helpers.ConverToTrainingPlan(req)
+	training := training.ConverToTrainingPlan(req)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(training, nil)
 
 	trainingUc := NewTrainingCreatorImpl(trainingRepo, zaptest.NewLogger(t))
@@ -55,7 +54,7 @@ func TestCreateTrainingError(t *testing.T) {
 	}
 	trainingRepo := new(mocks.TrainingPlans)
 
-	training := helpers.ConverToTrainingPlan(req)
+	training := training.ConverToTrainingPlan(req)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(models.TrainingPlan{}, errors.New("repo error"))
 
 	trainingUc := NewTrainingCreatorImpl(trainingRepo, zaptest.NewLogger(t))

@@ -3,6 +3,7 @@ module github.com/fiufit/trainings
 go 1.18
 
 require (
+	github.com/go-playground/assert/v2 v2.2.0
 	github.com/stretchr/testify v1.8.1
 	github.com/undefinedlabs/go-mpatch v1.0.6
 	gorm.io/gorm v1.25.0

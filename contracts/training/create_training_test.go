@@ -1,18 +1,17 @@
-package helpers
+package training
 
 import (
 	"testing"
 	"time"
 
-	"github.com/fiufit/trainings/contracts/training"
 	"github.com/fiufit/trainings/models"
-	"github.com/stretchr/testify/assert"
+	"github.com/go-playground/assert/v2"
 	"github.com/undefinedlabs/go-mpatch"
 )
 
 func TestConvertToExerciseOk(t *testing.T) {
 
-	req := training.ExerciseRequest{
+	req := ExerciseRequest{
 		Title:       "Test exercise",
 		Description: "Test description",
 	}
@@ -26,23 +25,23 @@ func TestConvertToExerciseOk(t *testing.T) {
 }
 
 func TestConvertToExercisesWithEmptySliceOk(t *testing.T) {
-	reqs := []training.ExerciseRequest{}
+	reqs := []ExerciseRequest{}
 	exercises := ConvertToExercises(reqs)
 
 	assert.Equal(t, []models.Exercise{}, exercises)
 }
 
 func TestConvertToExercisesOk(t *testing.T) {
-	req1 := training.ExerciseRequest{
+	req1 := ExerciseRequest{
 		Title:       "Test exercise 1",
 		Description: "Test description 1",
 	}
 
-	req2 := training.ExerciseRequest{
+	req2 := ExerciseRequest{
 		Title:       "Test exercise 2",
 		Description: "Test description 2",
 	}
-	reqs := []training.ExerciseRequest{req1, req2}
+	reqs := []ExerciseRequest{req1, req2}
 
 	exercise1 := models.Exercise{
 		ID:             int8(0),
@@ -71,17 +70,17 @@ func TestConverToTrainingPlanOk(t *testing.T) {
 		return creationDate
 	})
 
-	req1 := training.ExerciseRequest{
+	req1 := ExerciseRequest{
 		Title:       "Test exercise 1",
 		Description: "Test description 1",
 	}
 
-	req2 := training.ExerciseRequest{
+	req2 := ExerciseRequest{
 		Title:       "Test exercise 2",
 		Description: "Test description 2",
 	}
-	reqs := []training.ExerciseRequest{req1, req2}
-	req := training.CreateTrainingRequest{
+	reqs := []ExerciseRequest{req1, req2}
+	req := CreateTrainingRequest{
 		Name:        "Test Training Name",
 		Description: "Test Training Description",
 		TrainerID:   "Test Trainer ID",

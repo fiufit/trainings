@@ -25,7 +25,8 @@ func ConvertToExercises(exerciseReqs []training.ExerciseRequest) []models.Exerci
 	return exercises
 }
 
-func ConverToTrainingPlan(trainingReq training.CreateTrainingRequest, exercises []models.Exercise) models.TrainingPlan {
+func ConverToTrainingPlan(trainingReq training.CreateTrainingRequest) models.TrainingPlan {
+	exercises := ConvertToExercises(trainingReq.Exercises)
 	return models.TrainingPlan{
 		Name:        trainingReq.Name,
 		Description: trainingReq.Description,

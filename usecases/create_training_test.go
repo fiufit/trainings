@@ -30,7 +30,7 @@ func TestCreateTrainingOk(t *testing.T) {
 	}
 	trainingRepo := new(mocks.TrainingPlans)
 
-	training := helpers.ConverToTrainingPlan(req, helpers.ConvertToExercises(req.Exercises))
+	training := helpers.ConverToTrainingPlan(req)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(training, nil)
 
 	trainingUc := NewTrainingCreatorImpl(trainingRepo, zaptest.NewLogger(t))
@@ -55,7 +55,7 @@ func TestCreateTrainingError(t *testing.T) {
 	}
 	trainingRepo := new(mocks.TrainingPlans)
 
-	training := helpers.ConverToTrainingPlan(req, helpers.ConvertToExercises(req.Exercises))
+	training := helpers.ConverToTrainingPlan(req)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(models.TrainingPlan{}, errors.New("repo error"))
 
 	trainingUc := NewTrainingCreatorImpl(trainingRepo, zaptest.NewLogger(t))

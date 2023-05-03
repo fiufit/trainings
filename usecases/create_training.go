@@ -23,8 +23,7 @@ func NewTrainingCreatorImpl(trainings repositories.TrainingPlans, logger *zap.Lo
 }
 
 func (uc *TrainingCreatorImpl) CreateTraining(ctx context.Context, req training.CreateTrainingRequest) (training.CreateTrainingResponse, error) {
-	exercises := helpers.ConvertToExercises(req.Exercises)
-	newTraining := helpers.ConverToTrainingPlan(req, exercises)
+	newTraining := helpers.ConverToTrainingPlan(req)
 	createdTraining, err := uc.trainings.CreateTrainingPlan(ctx, newTraining)
 	return training.CreateTrainingResponse{TrainingPlan: createdTraining}, err
 }

@@ -2,7 +2,9 @@ package repositories
 
 import (
 	"context"
+	"strings"
 
+	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -25,6 +27,9 @@ func (repo TrainingRepository) CreateTrainingPlan(ctx context.Context, training 
 	db := repo.db.WithContext(ctx)
 	result := db.Create(&training)
 	if result.Error != nil {
+		if strings.Contains(result.Error.Error(), contracts.ErrForeignKey.Error()) {
+			return models.TrainingPlan{}, contracts.ErrUserNotFound
+		}
 		repo.logger.Error("Unable to create training plan", zap.Error(result.Error), zap.Any("training", training))
 		return models.TrainingPlan{}, result.Error
 	}

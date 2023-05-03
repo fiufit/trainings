@@ -1,8 +1,9 @@
 package contracts
 
 var errCodes = map[error]string{
-	ErrInternal:   "T0",
-	ErrBadRequest: "T1",
+	ErrInternal:     "T0",
+	ErrBadRequest:   "T1",
+	ErrUserNotFound: "T2",
 }
 
 type OkResponse struct {

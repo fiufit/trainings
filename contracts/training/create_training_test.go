@@ -19,7 +19,6 @@ func TestConvertToExerciseOk(t *testing.T) {
 
 	assert.Equal(t, exercise.Title, "Test exercise")
 	assert.Equal(t, exercise.Description, "Test description")
-	assert.Equal(t, exercise.Done, false)
 	assert.Equal(t, exercise.ID, int8(0))
 	assert.Equal(t, exercise.TrainingPlanID, int8(0))
 }
@@ -48,7 +47,6 @@ func TestConvertToExercisesOk(t *testing.T) {
 		TrainingPlanID: int8(0),
 		Title:          "Test exercise 1",
 		Description:    "Test description 1",
-		Done:           false,
 	}
 
 	exercise2 := models.Exercise{
@@ -56,7 +54,6 @@ func TestConvertToExercisesOk(t *testing.T) {
 		TrainingPlanID: int8(0),
 		Title:          "Test exercise 2",
 		Description:    "Test description 2",
-		Done:           false,
 	}
 
 	exercises := ConvertToExercises(reqs)
@@ -95,7 +92,6 @@ func TestConverToTrainingPlanOk(t *testing.T) {
 		TrainingPlanID: int8(0),
 		Title:          "Test exercise 1",
 		Description:    "Test description 1",
-		Done:           false,
 	}
 
 	exercise2 := models.Exercise{
@@ -103,7 +99,6 @@ func TestConverToTrainingPlanOk(t *testing.T) {
 		TrainingPlanID: int8(0),
 		Title:          "Test exercise 2",
 		Description:    "Test description 2",
-		Done:           false,
 	}
 
 	training := models.TrainingPlan{

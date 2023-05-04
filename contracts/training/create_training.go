@@ -28,7 +28,6 @@ func ConvertToExercise(exerciseReq ExerciseRequest) models.Exercise {
 	return models.Exercise{
 		Title:          exerciseReq.Title,
 		Description:    exerciseReq.Description,
-		Done:           false,
 		ID:             0,
 		TrainingPlanID: 0,
 	}

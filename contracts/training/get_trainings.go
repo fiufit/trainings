@@ -10,6 +10,7 @@ type GetTrainingsRequest struct {
 	Description string `form:"description"`
 	Difficulty  string `form:"difficulty"`
 	TrainerID   string `form:"trainer_id"`
+	Duration    int8   `form:"duration"`
 	contracts.Pagination
 }
 

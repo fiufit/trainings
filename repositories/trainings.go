@@ -47,27 +47,27 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 
 	if req.Name != "" {
 		likeName := fmt.Sprintf("%v%%", strings.ToLower(req.Name))
-		db = db.Where("LOWER(name) LIKE ?", likeName).Preload("Exercises")
+		db = db.Where("LOWER(name) LIKE ?", likeName)
 	}
 
 	if req.Description != "" {
 		likeDescription := fmt.Sprintf("%%%v%%", req.Description)
-		db = db.Where("LOWER(description) LIKE LOWER(?)", likeDescription).Preload("Exercises")
+		db = db.Where("LOWER(description) LIKE LOWER(?)", likeDescription)
 	}
 
 	if req.Difficulty != "" {
-		db = db.Where("LOWER(difficulty) = ?", strings.ToLower(req.Difficulty)).Preload("Exercises")
+		db = db.Where("LOWER(difficulty) = ?", strings.ToLower(req.Difficulty))
 	}
 
 	if req.TrainerID != "" {
-		db = db.Where("trainer_id = ?", req.TrainerID).Preload("Exercises")
+		db = db.Where("trainer_id = ?", req.TrainerID)
 	}
 
 	if req.MinDuration != 0 || req.MaxDuration != 0 {
-		db = db.Where("duration >= ? AND (duration <= ? OR ? = 0)", req.MinDuration, req.MaxDuration, req.MaxDuration).Preload("Exercises")
+		db = db.Where("duration >= ? AND (duration <= ? OR ? = 0)", req.MinDuration, req.MaxDuration, req.MaxDuration)
 	}
 
-	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Find(&res)
+	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Find(&res)
 	if result.Error != nil {
 		repo.logger.Error("Unable to get training plans with pagination", zap.Error(result.Error), zap.Any("request", req))
 		return training.GetTrainingsResponse{}, result.Error

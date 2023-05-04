@@ -19,9 +19,8 @@ func TestConvertToExerciseOk(t *testing.T) {
 
 	assert.Equal(t, exercise.Title, "Test exercise")
 	assert.Equal(t, exercise.Description, "Test description")
-	assert.Equal(t, exercise.Done, false)
-	assert.Equal(t, exercise.ID, int8(0))
-	assert.Equal(t, exercise.TrainingPlanID, int8(0))
+	assert.Equal(t, exercise.ID, uint(0))
+	assert.Equal(t, exercise.TrainingPlanID, uint(0))
 }
 
 func TestConvertToExercisesWithEmptySliceOk(t *testing.T) {
@@ -44,19 +43,17 @@ func TestConvertToExercisesOk(t *testing.T) {
 	reqs := []ExerciseRequest{req1, req2}
 
 	exercise1 := models.Exercise{
-		ID:             int8(0),
-		TrainingPlanID: int8(0),
+		ID:             uint(0),
+		TrainingPlanID: uint(0),
 		Title:          "Test exercise 1",
 		Description:    "Test description 1",
-		Done:           false,
 	}
 
 	exercise2 := models.Exercise{
-		ID:             int8(0),
-		TrainingPlanID: int8(0),
+		ID:             uint(0),
+		TrainingPlanID: uint(0),
 		Title:          "Test exercise 2",
 		Description:    "Test description 2",
-		Done:           false,
 	}
 
 	exercises := ConvertToExercises(reqs)
@@ -91,23 +88,21 @@ func TestConverToTrainingPlanOk(t *testing.T) {
 	}
 
 	exercise1 := models.Exercise{
-		ID:             int8(0),
-		TrainingPlanID: int8(0),
+		ID:             uint(0),
+		TrainingPlanID: uint(0),
 		Title:          "Test exercise 1",
 		Description:    "Test description 1",
-		Done:           false,
 	}
 
 	exercise2 := models.Exercise{
-		ID:             int8(0),
-		TrainingPlanID: int8(0),
+		ID:             uint(0),
+		TrainingPlanID: uint(0),
 		Title:          "Test exercise 2",
 		Description:    "Test description 2",
-		Done:           false,
 	}
 
 	training := models.TrainingPlan{
-		ID:          0,
+		ID:          uint(0),
 		Name:        "Test Training Name",
 		Description: "Test Training Description",
 		TrainerID:   "Test Trainer ID",

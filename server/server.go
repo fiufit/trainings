@@ -43,11 +43,12 @@ func NewServer() *Server {
 	trainingRepo := repositories.NewTrainingRepository(db, logger)
 
 	// USECASES
-	trainingUc := usecases.NewTrainingCreatorImpl(trainingRepo, logger)
+	createTrainingUc := usecases.NewTrainingCreatorImpl(trainingRepo, logger)
+	getTrainingUc := usecases.NewTrainingGetterImpl(trainingRepo, logger)
 
 	// HANDLERS
-	createTraining := handlers.NewCreateTraining(&trainingUc, logger)
-	getTrainings := handlers.NewGetTrainings(logger)
+	createTraining := handlers.NewCreateTraining(&createTrainingUc, logger)
+	getTrainings := handlers.NewGetTrainings(&getTrainingUc, logger)
 
 	return &Server{
 		router:         gin.Default(),

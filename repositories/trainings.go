@@ -63,6 +63,10 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 		db = db.Where("trainer_id = ?", req.TrainerID).Preload("Exercises")
 	}
 
+	if req.MinDuration != 0 || req.MaxDuration != 0 {
+		db = db.Where("duration >= ? AND (duration <= ? OR ? = 0)", req.MinDuration, req.MaxDuration, req.MaxDuration).Preload("Exercises")
+	}
+
 	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Find(&res)
 	if result.Error != nil {
 		repo.logger.Error("Unable to get training plans with pagination", zap.Error(result.Error), zap.Any("request", req))

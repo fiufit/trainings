@@ -1,0 +1,33 @@
+# fly.toml file generated for fiufit-trainings on 2023-05-03T18:46:08-03:00
+
+app = "fiufit-trainings"
+kill_signal = "SIGINT"
+kill_timeout = 5
+mounts = []
+primary_region = "gru"
+processes = []
+
+[[services]]
+  internal_port = 8888
+  processes = ["app"]
+  protocol = "tcp"
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    force_https = false
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+[env]
+  SERVICE_PORT = "8888"
+  DB_HOST = "db.yohuhdcgcaxsccbfyqje.supabase.co"
+  DB_NAME = "postgres"
+  DB_PORT = 5432
+  DB_USER = "postgres"

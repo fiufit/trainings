@@ -18,11 +18,11 @@ type TrainingUpdaterImpl struct {
 	logger    *zap.Logger
 }
 
-func NewTrainingUpdaterImpl(trainings repositories.TrainingPlans, logger *zap.Logger) TrainingCreatorImpl {
-	return TrainingCreatorImpl{trainings: trainings, logger: logger}
+func NewTrainingUpdaterImpl(trainings repositories.TrainingPlans, logger *zap.Logger) TrainingUpdaterImpl {
+	return TrainingUpdaterImpl{trainings: trainings, logger: logger}
 }
 
-func (uc *TrainingCreatorImpl) UpdateTrainingPlan(ctx context.Context, req training.UpdateTrainingRequest) (models.TrainingPlan, error) {
+func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req training.UpdateTrainingRequest) (models.TrainingPlan, error) {
 	training, err := uc.trainings.GetTrainingByID(ctx, req.ID)
 	if err != nil {
 		return models.TrainingPlan{}, err
@@ -40,7 +40,7 @@ func (uc *TrainingCreatorImpl) UpdateTrainingPlan(ctx context.Context, req train
 	return updatedTraining, nil
 }
 
-func (uc *TrainingCreatorImpl) patchTrainingModel(ctx context.Context, training models.TrainingPlan, req training.UpdateTrainingRequest) (models.TrainingPlan, error) {
+func (uc *TrainingUpdaterImpl) patchTrainingModel(ctx context.Context, training models.TrainingPlan, req training.UpdateTrainingRequest) (models.TrainingPlan, error) {
 	if req.Name != "" {
 		training.Name = req.Name
 	}

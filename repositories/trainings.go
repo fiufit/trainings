@@ -47,7 +47,7 @@ func (repo TrainingRepository) CreateTrainingPlan(ctx context.Context, training 
 func (repo TrainingRepository) GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error) {
 	db := repo.db.WithContext(ctx)
 	var training models.TrainingPlan
-	result := db.First(&training, "id = ?", id)
+	result := db.Preload("Exercises").First(&training, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return models.TrainingPlan{}, contracts.ErrUserNotFound

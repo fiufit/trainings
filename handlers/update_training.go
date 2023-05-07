@@ -34,8 +34,8 @@ func (h UpdateTraining) Handle() gin.HandlerFunc {
 
 		updatedTraining, err := h.trainings.UpdateTrainingPlan(ctx, req)
 		if err != nil {
-			if errors.Is(err, contracts.ErrUserNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(contracts.ErrUserNotFound))
+			if errors.Is(err, contracts.ErrTrainingPlanNotFound) {
+				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(contracts.ErrTrainingPlanNotFound))
 				return
 			}
 			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))

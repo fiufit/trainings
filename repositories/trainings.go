@@ -50,7 +50,7 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, id string) (
 	result := db.Preload("Exercises").First(&training, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return models.TrainingPlan{}, contracts.ErrUserNotFound
+			return models.TrainingPlan{}, contracts.ErrTrainingPlanNotFound
 		}
 		repo.logger.Error("Unable to get training plan", zap.Error(result.Error), zap.String("ID", id))
 		return models.TrainingPlan{}, result.Error

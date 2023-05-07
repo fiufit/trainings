@@ -38,12 +38,14 @@ func NewServer() *Server {
 	}
 
 	logger, _ := zap.NewDevelopment()
+	usersUrl := os.Getenv("USERS_SERVICE_URL")
 
 	// REPOSITORIES
 	trainingRepo := repositories.NewTrainingRepository(db, logger)
+	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
 
 	// USECASES
-	createTrainingUc := usecases.NewTrainingCreatorImpl(trainingRepo, logger)
+	createTrainingUc := usecases.NewTrainingCreatorImpl(trainingRepo, userRepo, logger)
 	getTrainingUc := usecases.NewTrainingGetterImpl(trainingRepo, logger)
 
 	// HANDLERS

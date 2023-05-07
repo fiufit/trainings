@@ -9,7 +9,6 @@ type TrainingPlan struct {
 	Difficulty  string `gorm:"not null"`
 	Duration    uint   `gorm:"not null"`
 	TrainerID   string
-	Trainer     User       `gorm:"foreignKey:TrainerID" json:"-"`
 	CreatedAt   time.Time  `gorm:"not null"`
 	Exercises   []Exercise `gorm:"foreignKey:TrainingPlanID"`
 }

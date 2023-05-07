@@ -40,6 +40,30 @@ func (_m *TrainingPlans) CreateTrainingPlan(ctx context.Context, _a1 models.Trai
 	return r0, r1
 }
 
+// GetTrainingByID provides a mock function with given fields: ctx, id
+func (_m *TrainingPlans) GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 models.TrainingPlan
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (models.TrainingPlan, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) models.TrainingPlan); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(models.TrainingPlan)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetTrainingPlans provides a mock function with given fields: ctx, req
 func (_m *TrainingPlans) GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error) {
 	ret := _m.Called(ctx, req)
@@ -57,6 +81,30 @@ func (_m *TrainingPlans) GetTrainingPlans(ctx context.Context, req training.GetT
 
 	if rf, ok := ret.Get(1).(func(context.Context, training.GetTrainingsRequest) error); ok {
 		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UpdateTrainingPlan provides a mock function with given fields: ctx, _a1
+func (_m *TrainingPlans) UpdateTrainingPlan(ctx context.Context, _a1 models.TrainingPlan) (models.TrainingPlan, error) {
+	ret := _m.Called(ctx, _a1)
+
+	var r0 models.TrainingPlan
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.TrainingPlan) (models.TrainingPlan, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.TrainingPlan) models.TrainingPlan); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		r0 = ret.Get(0).(models.TrainingPlan)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.TrainingPlan) error); ok {
+		r1 = rf(ctx, _a1)
 	} else {
 		r1 = ret.Error(1)
 	}

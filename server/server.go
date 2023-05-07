@@ -17,6 +17,7 @@ type Server struct {
 	router         *gin.Engine
 	createTraining handlers.CreateTraining
 	getTrainings   handlers.GetTrainings
+	updateTraining handlers.UpdateTraining
 }
 
 func (s *Server) Run() {
@@ -45,14 +46,17 @@ func NewServer() *Server {
 	// USECASES
 	createTrainingUc := usecases.NewTrainingCreatorImpl(trainingRepo, logger)
 	getTrainingUc := usecases.NewTrainingGetterImpl(trainingRepo, logger)
+	updateTrainingUc := usecases.NewTrainingUpdaterImpl(trainingRepo, logger)
 
 	// HANDLERS
 	createTraining := handlers.NewCreateTraining(&createTrainingUc, logger)
 	getTrainings := handlers.NewGetTrainings(&getTrainingUc, logger)
+	updateTraining := handlers.NewUpdateTraining(&updateTrainingUc, logger)
 
 	return &Server{
 		router:         gin.Default(),
 		createTraining: createTraining,
 		getTrainings:   getTrainings,
+		updateTraining: updateTraining,
 	}
 }

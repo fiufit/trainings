@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"errors"
 
 	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/models"
@@ -40,11 +39,11 @@ func (repo ExerciseRepository) DeleteExercise(ctx context.Context, exerciseID st
 	var exercise models.Exercise
 	result := db.Delete(&exercise, "id = ?", exerciseID)
 	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return contracts.ErrExerciseNotFound
-		}
 		repo.logger.Error("Unable to delete exercise", zap.Error(result.Error), zap.Any("exercise", exercise))
 		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return contracts.ErrExerciseNotFound
 	}
 	return nil
 }

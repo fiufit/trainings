@@ -3,7 +3,6 @@ package exercises
 import (
 	"context"
 
-	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/contracts/training"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
@@ -25,12 +24,9 @@ func NewExerciseGetterImpl(trainings repositories.TrainingPlans, exercises repos
 }
 
 func (uc *ExerciseGetterImpl) GetExerciseByID(ctx context.Context, req training.GetExerciseRequest) (models.Exercise, error) {
-	training, err := uc.trainings.GetTrainingByID(ctx, req.TrainingPlanID)
+	_, err := uc.trainings.GetTrainingByID(ctx, req.TrainingPlanID)
 	if err != nil {
 		return models.Exercise{}, err
-	}
-	if training.TrainerID != req.TrainerID {
-		return models.Exercise{}, contracts.ErrUnauthorizedTrainer
 	}
 	return uc.exercises.GetExerciseByID(ctx, req.ExerciseID)
 }

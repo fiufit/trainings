@@ -23,11 +23,6 @@ func NewGetExercises(exercises exercises.ExerciseGetter, logger *zap.Logger) Get
 func (h GetExercise) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req training.GetExerciseRequest
-		err := ctx.ShouldBindJSON(&req)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
-			return
-		}
 
 		trainingID := ctx.MustGet("trainingID").(string)
 		exerciseID := ctx.MustGet("exerciseID").(string)

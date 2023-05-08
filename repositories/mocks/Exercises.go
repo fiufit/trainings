@@ -52,6 +52,54 @@ func (_m *Exercises) DeleteExercise(ctx context.Context, exerciseID string) erro
 	return r0
 }
 
+// GetExerciseByID provides a mock function with given fields: ctx, exerciseID
+func (_m *Exercises) GetExerciseByID(ctx context.Context, exerciseID string) (models.Exercise, error) {
+	ret := _m.Called(ctx, exerciseID)
+
+	var r0 models.Exercise
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (models.Exercise, error)); ok {
+		return rf(ctx, exerciseID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) models.Exercise); ok {
+		r0 = rf(ctx, exerciseID)
+	} else {
+		r0 = ret.Get(0).(models.Exercise)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, exerciseID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UpdateExercise provides a mock function with given fields: ctx, exercise
+func (_m *Exercises) UpdateExercise(ctx context.Context, exercise models.Exercise) (models.Exercise, error) {
+	ret := _m.Called(ctx, exercise)
+
+	var r0 models.Exercise
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, models.Exercise) (models.Exercise, error)); ok {
+		return rf(ctx, exercise)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, models.Exercise) models.Exercise); ok {
+		r0 = rf(ctx, exercise)
+	} else {
+		r0 = ret.Get(0).(models.Exercise)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, models.Exercise) error); ok {
+		r1 = rf(ctx, exercise)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type mockConstructorTestingTNewExercises interface {
 	mock.TestingT
 	Cleanup(func())

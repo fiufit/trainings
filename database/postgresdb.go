@@ -40,5 +40,6 @@ func NewPostgresDBClient() (*gorm.DB, error) {
 	}
 	connStr := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v", dbHost, dbPort, dbUser, dbPass, dbName, dbSSL)
 	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{TranslateError: true})
+	db.Exec(`set search_path='trainings'`)
 	return db, err
 }

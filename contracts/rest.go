@@ -3,8 +3,16 @@ package contracts
 var errCodes = map[error]string{
 	ErrInternal:             "T0",
 	ErrBadRequest:           "T1",
-	ErrUserNotFound:         "T2",
-	ErrTrainingPlanNotFound: "T3",
+	ErrTrainingPlanNotFound: "T2",
+	ErrUserInternal:         "U0",
+	ErrUserBadRequest:       "U1",
+	ErrUserNotFound:         "U2",
+}
+
+var externalCodes = map[string]error{
+	"U0": ErrUserInternal,
+	"U1": ErrUserBadRequest,
+	"U2": ErrUserNotFound,
 }
 
 type OkResponse struct {

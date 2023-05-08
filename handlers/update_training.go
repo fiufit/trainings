@@ -38,6 +38,10 @@ func (h UpdateTraining) Handle() gin.HandlerFunc {
 				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(contracts.ErrTrainingPlanNotFound))
 				return
 			}
+			if errors.Is(err, contracts.ErrUnauthorizedTrainer) {
+				ctx.JSON(http.StatusUnauthorized, contracts.FormatErrResponse(contracts.ErrUnauthorizedTrainer))
+				return
+			}
 			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
 			return
 		}

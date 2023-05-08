@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
+//go:generate mockery --name Users
 type Users interface {
 	GetUserByID(ctx context.Context, userID string) (users.GetUserResponse, error)
 }

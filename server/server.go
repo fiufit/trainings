@@ -18,6 +18,8 @@ type Server struct {
 	createTraining handlers.CreateTraining
 	getTrainings   handlers.GetTrainings
 	updateTraining handlers.UpdateTraining
+	createExercise handlers.CreateExercise
+	deleteExercise handlers.DeleteExercise
 }
 
 func (s *Server) Run() {
@@ -44,21 +46,27 @@ func NewServer() *Server {
 	// REPOSITORIES
 	trainingRepo := repositories.NewTrainingRepository(db, logger)
 	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
+	exerciseRepo := repositories.NewExerciseRepository(db, logger)
 
 	// USECASES
 	createTrainingUc := usecases.NewTrainingCreatorImpl(trainingRepo, userRepo, logger)
 	getTrainingUc := usecases.NewTrainingGetterImpl(trainingRepo, logger)
 	updateTrainingUc := usecases.NewTrainingUpdaterImpl(trainingRepo, logger)
 
+	createExerciseUc := usecases.NewExerciseCreatorImpl(trainingRepo, exerciseRepo, logger)
+
 	// HANDLERS
 	createTraining := handlers.NewCreateTraining(&createTrainingUc, logger)
 	getTrainings := handlers.NewGetTrainings(&getTrainingUc, logger)
 	updateTraining := handlers.NewUpdateTraining(&updateTrainingUc, logger)
+
+	createExercise := handlers.NewCreateExercise(&createExerciseUc, logger)
 
 	return &Server{
 		router:         gin.Default(),
 		createTraining: createTraining,
 		getTrainings:   getTrainings,
 		updateTraining: updateTraining,
+		createExercise: createExercise,
 	}
 }

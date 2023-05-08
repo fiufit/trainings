@@ -8,8 +8,10 @@ import (
 func (s *Server) InitRoutes() {
 	baseRouter := s.router.Group("/:version")
 	trainingRouter := baseRouter.Group("/trainings")
+	exerciseRouter := trainingRouter.Group("/:trainingID/exercises")
 
 	s.InitTrainingRoutes(trainingRouter)
+	s.InitExerciseRouter(exerciseRouter)
 
 }
 
@@ -25,4 +27,14 @@ func (s *Server) InitTrainingRoutes(router *gin.RouterGroup) {
 	router.PATCH("/:trainingID", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.updateTraining.Handle(),
 	}))
+}
+
+func (s *Server) InitExerciseRouter(router *gin.RouterGroup) {
+	router.POST("", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.createExercise.Handle(),
+	}))
+
+	// router.DELETE("", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+	// 	"v1": s.deleteExercise.Handle(),
+	// }))
 }

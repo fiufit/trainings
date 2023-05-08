@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -16,7 +17,9 @@ import (
 //go:generate mockery --name TrainingPlans
 type TrainingPlans interface {
 	CreateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
+	GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error)
 	GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error)
+	UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
 }
 
 type TrainingRepository struct {
@@ -38,6 +41,21 @@ func (repo TrainingRepository) CreateTrainingPlan(ctx context.Context, training 
 		repo.logger.Error("Unable to create training plan", zap.Error(result.Error), zap.Any("training", training))
 		return models.TrainingPlan{}, result.Error
 	}
+	return training, nil
+}
+
+func (repo TrainingRepository) GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error) {
+	db := repo.db.WithContext(ctx)
+	var training models.TrainingPlan
+	result := db.Preload("Exercises").First(&training, "id = ?", id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return models.TrainingPlan{}, contracts.ErrTrainingPlanNotFound
+		}
+		repo.logger.Error("Unable to get training plan", zap.Error(result.Error), zap.String("ID", id))
+		return models.TrainingPlan{}, result.Error
+	}
+
 	return training, nil
 }
 
@@ -74,4 +92,14 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 	}
 
 	return training.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
+}
+
+func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error) {
+	db := repo.db.WithContext(ctx)
+	result := db.Save(&training)
+	if result.Error != nil {
+		repo.logger.Error("Unable to update training plan", zap.Error(result.Error), zap.Any("training", training))
+		return models.TrainingPlan{}, result.Error
+	}
+	return training, nil
 }

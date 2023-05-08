@@ -1,11 +1,12 @@
 package contracts
 
 var errCodes = map[error]string{
-	ErrInternal:       "T0",
-	ErrBadRequest:     "T1",
-	ErrUserInternal:   "U0",
-	ErrUserBadRequest: "U1",
-	ErrUserNotFound:   "U2",
+	ErrInternal:             "T0",
+	ErrBadRequest:           "T1",
+	ErrTrainingPlanNotFound: "T2",
+	ErrUserInternal:         "U0",
+	ErrUserBadRequest:       "U1",
+	ErrUserNotFound:         "U2",
 }
 
 var externalCodes = map[string]error{

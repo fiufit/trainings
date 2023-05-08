@@ -1,4 +1,4 @@
-package usecases
+package exercises
 
 import (
 	"context"
@@ -34,6 +34,9 @@ func (uc *ExerciseUpdaterImpl) UpdateExercise(ctx context.Context, req training.
 	}
 
 	exercise, err := uc.exercises.GetExerciseByID(ctx, req.ExerciseID)
+	if err != nil {
+		return models.Exercise{}, err
+	}
 
 	patchedExercise, err := uc.patchExerciseModel(ctx, exercise, req)
 	if err != nil {

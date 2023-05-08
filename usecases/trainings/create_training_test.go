@@ -1,4 +1,4 @@
-package usecases
+package trainings
 
 import (
 	"context"

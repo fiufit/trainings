@@ -41,4 +41,8 @@ func (s *Server) InitExerciseRouter(router *gin.RouterGroup) {
 	router.PATCH("/:exerciseID", middleware.BindTrainingIDFromUri(), middleware.BindExerciseIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.updateExercise.Handle(),
 	}))
+
+	router.GET("/:exerciseID", middleware.BindTrainingIDFromUri(), middleware.BindExerciseIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getExercise.Handle(),
+	}))
 }

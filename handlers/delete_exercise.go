@@ -6,17 +6,17 @@ import (
 
 	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/usecases"
+	"github.com/fiufit/trainings/usecases/exercises"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type DeleteExercise struct {
-	exercises usecases.ExerciseDeleter
+	exercises exercises.ExerciseDeleter
 	logger    *zap.Logger
 }
 
-func NewDeleteExercise(exercises usecases.ExerciseDeleter, logger *zap.Logger) DeleteExercise {
+func NewDeleteExercise(exercises exercises.ExerciseDeleter, logger *zap.Logger) DeleteExercise {
 	return DeleteExercise{exercises: exercises, logger: logger}
 }
 

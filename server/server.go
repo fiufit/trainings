@@ -54,6 +54,7 @@ func NewServer() *Server {
 	updateTrainingUc := usecases.NewTrainingUpdaterImpl(trainingRepo, logger)
 
 	createExerciseUc := usecases.NewExerciseCreatorImpl(trainingRepo, exerciseRepo, logger)
+	deleteExerciseUc := usecases.NewExerciseDeleterImpl(trainingRepo, exerciseRepo, logger)
 
 	// HANDLERS
 	createTraining := handlers.NewCreateTraining(&createTrainingUc, logger)
@@ -61,6 +62,7 @@ func NewServer() *Server {
 	updateTraining := handlers.NewUpdateTraining(&updateTrainingUc, logger)
 
 	createExercise := handlers.NewCreateExercise(&createExerciseUc, logger)
+	deleteExercise := handlers.NewDeleteExercise(&deleteExerciseUc, logger)
 
 	return &Server{
 		router:         gin.Default(),
@@ -68,5 +70,6 @@ func NewServer() *Server {
 		getTrainings:   getTrainings,
 		updateTraining: updateTraining,
 		createExercise: createExercise,
+		deleteExercise: deleteExercise,
 	}
 }

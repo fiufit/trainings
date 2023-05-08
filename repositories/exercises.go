@@ -2,7 +2,9 @@ package repositories
 
 import (
 	"context"
+	"errors"
 
+	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -11,6 +13,7 @@ import (
 //go:generate mockery --name Exercises
 type Exercises interface {
 	CreateExercise(ctx context.Context, exercise models.Exercise) (models.Exercise, error)
+	DeleteExercise(ctx context.Context, exerciseID string) error
 }
 
 type ExerciseRepository struct {
@@ -30,4 +33,18 @@ func (repo ExerciseRepository) CreateExercise(ctx context.Context, exercise mode
 		return models.Exercise{}, result.Error
 	}
 	return exercise, nil
+}
+
+func (repo ExerciseRepository) DeleteExercise(ctx context.Context, exerciseID string) error {
+	db := repo.db.WithContext(ctx)
+	var exercise models.Exercise
+	result := db.Delete(&exercise, "id = ?", exerciseID)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return contracts.ErrExerciseNotFound
+		}
+		repo.logger.Error("Unable to delete exercise", zap.Error(result.Error), zap.Any("exercise", exercise))
+		return result.Error
+	}
+	return nil
 }

@@ -34,7 +34,7 @@ func (s *Server) InitExerciseRouter(router *gin.RouterGroup) {
 		"v1": s.createExercise.Handle(),
 	}))
 
-	// router.DELETE("", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
-	// 	"v1": s.deleteExercise.Handle(),
-	// }))
+	router.DELETE("/:exerciseID", middleware.BindTrainingIDFromUri(), middleware.BindExerciseIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.deleteExercise.Handle(),
+	}))
 }

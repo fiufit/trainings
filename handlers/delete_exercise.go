@@ -1,12 +1,56 @@
 package handlers
 
-import "go.uber.org/zap"
+import (
+	"errors"
+	"net/http"
+
+	"github.com/fiufit/trainings/contracts"
+	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/usecases"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+)
 
 type DeleteExercise struct {
-	//exercises usecases.ExerciseDeleter
-	logger *zap.Logger
+	exercises usecases.ExerciseDeleter
+	logger    *zap.Logger
 }
 
-// func NewDeleteExercise(exercises usecases.ExerciseDeleter, logger *zap.Logger) DeleteExercise {
-// 	return DeleteExercise{exercises: exercises, logger: logger}
-// }
+func NewDeleteExercise(exercises usecases.ExerciseDeleter, logger *zap.Logger) DeleteExercise {
+	return DeleteExercise{exercises: exercises, logger: logger}
+}
+
+func (h DeleteExercise) Handle() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req training.DeleteExerciseRequest
+		err := ctx.ShouldBindJSON(&req)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
+			return
+		}
+
+		trainingID := ctx.MustGet("trainingID").(string)
+		exerciseID := ctx.MustGet("exerciseID").(string)
+		req.TrainingPlanID = trainingID
+		req.ExerciseID = exerciseID
+
+		err = h.exercises.DeleteExercise(ctx, req)
+		if err != nil {
+			if errors.Is(err, contracts.ErrExerciseNotFound) {
+				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
+				return
+			}
+			if errors.Is(err, contracts.ErrUnauthorizedTrainer) {
+				ctx.JSON(http.StatusUnauthorized, contracts.FormatErrResponse(err))
+				return
+			}
+			if errors.Is(err, contracts.ErrTrainingPlanNotFound) {
+				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			return
+		}
+		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(""))
+	}
+}

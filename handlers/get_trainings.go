@@ -5,17 +5,17 @@ import (
 
 	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/usecases"
+	"github.com/fiufit/trainings/usecases/trainings"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type GetTrainings struct {
-	trainings usecases.TrainingGetter
+	trainings trainings.TrainingGetter
 	logger    *zap.Logger
 }
 
-func NewGetTrainings(trainings usecases.TrainingGetter, logger *zap.Logger) GetTrainings {
+func NewGetTrainings(trainings trainings.TrainingGetter, logger *zap.Logger) GetTrainings {
 	return GetTrainings{trainings: trainings, logger: logger}
 }
 

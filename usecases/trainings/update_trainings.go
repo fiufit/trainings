@@ -1,8 +1,9 @@
-package usecases
+package trainings
 
 import (
 	"context"
 
+	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/contracts/training"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
@@ -26,6 +27,9 @@ func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req train
 	training, err := uc.trainings.GetTrainingByID(ctx, req.ID)
 	if err != nil {
 		return models.TrainingPlan{}, err
+	}
+	if training.TrainerID != req.TrainerID {
+		return models.TrainingPlan{}, contracts.ErrUnauthorizedTrainer
 	}
 
 	patchedTraining, err := uc.patchTrainingModel(ctx, training, req)

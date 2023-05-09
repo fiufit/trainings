@@ -8,7 +8,8 @@ import (
 	"github.com/fiufit/trainings/handlers"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
-	"github.com/fiufit/trainings/usecases"
+	"github.com/fiufit/trainings/usecases/exercises"
+	"github.com/fiufit/trainings/usecases/trainings"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -18,6 +19,10 @@ type Server struct {
 	createTraining handlers.CreateTraining
 	getTrainings   handlers.GetTrainings
 	updateTraining handlers.UpdateTraining
+	createExercise handlers.CreateExercise
+	deleteExercise handlers.DeleteExercise
+	updateExercise handlers.UpdateExercise
+	getExercise    handlers.GetExercise
 }
 
 func (s *Server) Run() {
@@ -44,21 +49,36 @@ func NewServer() *Server {
 	// REPOSITORIES
 	trainingRepo := repositories.NewTrainingRepository(db, logger)
 	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
+	exerciseRepo := repositories.NewExerciseRepository(db, logger)
 
 	// USECASES
-	createTrainingUc := usecases.NewTrainingCreatorImpl(trainingRepo, userRepo, logger)
-	getTrainingUc := usecases.NewTrainingGetterImpl(trainingRepo, logger)
-	updateTrainingUc := usecases.NewTrainingUpdaterImpl(trainingRepo, logger)
+	createTrainingUc := trainings.NewTrainingCreatorImpl(trainingRepo, userRepo, logger)
+	getTrainingUc := trainings.NewTrainingGetterImpl(trainingRepo, logger)
+	updateTrainingUc := trainings.NewTrainingUpdaterImpl(trainingRepo, logger)
+
+	createExerciseUc := exercises.NewExerciseCreatorImpl(trainingRepo, exerciseRepo, logger)
+	deleteExerciseUc := exercises.NewExerciseDeleterImpl(trainingRepo, exerciseRepo, logger)
+	updateExerciseUc := exercises.NewExerciseUpdaterImpl(trainingRepo, exerciseRepo, logger)
+	getExerciseUc := exercises.NewExerciseGetterImpl(trainingRepo, exerciseRepo, logger)
 
 	// HANDLERS
 	createTraining := handlers.NewCreateTraining(&createTrainingUc, logger)
 	getTrainings := handlers.NewGetTrainings(&getTrainingUc, logger)
 	updateTraining := handlers.NewUpdateTraining(&updateTrainingUc, logger)
 
+	createExercise := handlers.NewCreateExercise(&createExerciseUc, logger)
+	deleteExercise := handlers.NewDeleteExercise(&deleteExerciseUc, logger)
+	updateExercise := handlers.NewUpdateExercise(&updateExerciseUc, logger)
+	getExercise := handlers.NewGetExercises(&getExerciseUc, logger)
+
 	return &Server{
 		router:         gin.Default(),
 		createTraining: createTraining,
 		getTrainings:   getTrainings,
 		updateTraining: updateTraining,
+		createExercise: createExercise,
+		deleteExercise: deleteExercise,
+		updateExercise: updateExercise,
+		getExercise:    getExercise,
 	}
 }

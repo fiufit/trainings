@@ -31,3 +31,4 @@ processes = []
   DB_NAME = "postgres"
   DB_PORT = 5432
   DB_USER = "postgres"
+  FIREBASE_BUCKET_NAME = "fiufit.appspot.com"

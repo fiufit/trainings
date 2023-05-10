@@ -67,7 +67,7 @@ func (repo FirebaseRepository) GetTrainingPictureUrl(ctx context.Context, traini
 		if !errors.Is(err, storage.ErrObjectNotExist) {
 			repo.logger.Error("Unable to retrieve training picture from firebase storage", zap.String("trainingID", trainingID))
 		}
-		return defaultPictureUrl
+		trainingPicturePath = defaultPictureUrl
 	}
 
 	opts := storage.SignedURLOptions{
@@ -76,7 +76,7 @@ func (repo FirebaseRepository) GetTrainingPictureUrl(ctx context.Context, traini
 	}
 	pictureUrl, err := repo.storageBucket.SignedURL(trainingPicturePath, &opts)
 	if err != nil {
-		pictureUrl = defaultPictureUrl
+		pictureUrl = ""
 		repo.logger.Error("Unable to sign training picture from firebase storage", zap.String("trainingID", trainingID))
 	}
 	return pictureUrl

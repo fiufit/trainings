@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -59,7 +58,7 @@ func NewFirebaseRepository(logger *zap.Logger, sdkJson []byte, storageBucketName
 }
 
 func (repo FirebaseRepository) GetTrainingPictureUrl(ctx context.Context, trainingID string, trainerID string) string {
-	defaultPictureUrl := fmt.Sprintf("https://storage.cloud.google.com/%v/training_pictures/default.png", repo.storageBucketName)
+	defaultPicturePath := "training_pictures/default.png"
 	trainingPicturePath := "training_pictures/" + trainerID + "/" + trainingID + "/training.png"
 	pictureHandle := repo.storageBucket.Object(trainingPicturePath)
 	_, err := pictureHandle.Attrs(ctx)
@@ -67,7 +66,7 @@ func (repo FirebaseRepository) GetTrainingPictureUrl(ctx context.Context, traini
 		if !errors.Is(err, storage.ErrObjectNotExist) {
 			repo.logger.Error("Unable to retrieve training picture from firebase storage", zap.String("trainingID", trainingID))
 		}
-		trainingPicturePath = defaultPictureUrl
+		trainingPicturePath = defaultPicturePath
 	}
 
 	opts := storage.SignedURLOptions{

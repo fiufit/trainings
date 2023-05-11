@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -46,15 +47,26 @@ func NewServer() *Server {
 	logger, _ := zap.NewDevelopment()
 	usersUrl := os.Getenv("USERS_SERVICE_URL")
 
+	sdkJson, err := base64.StdEncoding.DecodeString(os.Getenv("FIREBASE_B64_SDK_JSON"))
+	if err != nil {
+		panic(err)
+	}
+
+	bucketName := os.Getenv("FIREBASE_BUCKET_NAME")
+
 	// REPOSITORIES
 	trainingRepo := repositories.NewTrainingRepository(db, logger)
 	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
 	exerciseRepo := repositories.NewExerciseRepository(db, logger)
+	firebaseRepo, err := repositories.NewFirebaseRepository(logger, sdkJson, bucketName)
+	if err != nil {
+		panic(err)
+	}
 
 	// USECASES
 	createTrainingUc := trainings.NewTrainingCreatorImpl(trainingRepo, userRepo, logger)
-	getTrainingUc := trainings.NewTrainingGetterImpl(trainingRepo, logger)
-	updateTrainingUc := trainings.NewTrainingUpdaterImpl(trainingRepo, logger)
+	getTrainingUc := trainings.NewTrainingGetterImpl(trainingRepo, firebaseRepo, logger)
+	updateTrainingUc := trainings.NewTrainingUpdaterImpl(trainingRepo, firebaseRepo, logger)
 
 	createExerciseUc := exercises.NewExerciseCreatorImpl(trainingRepo, exerciseRepo, logger)
 	deleteExerciseUc := exercises.NewExerciseDeleterImpl(trainingRepo, exerciseRepo, logger)

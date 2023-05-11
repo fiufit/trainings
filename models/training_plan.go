@@ -11,4 +11,5 @@ type TrainingPlan struct {
 	TrainerID   string
 	CreatedAt   time.Time  `gorm:"not null"`
 	Exercises   []Exercise `gorm:"foreignKey:TrainingPlanID"`
+	PictureUrl  string     `gorm:"-"`
 }

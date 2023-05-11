@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/fiufit/trainings/contracts"
@@ -20,6 +21,7 @@ type TrainingPlans interface {
 	GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error)
 	GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error)
 	UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
+	DeleteTrainingPlan(ctx context.Context, trainingID string) error
 }
 
 type TrainingRepository struct {
@@ -102,4 +104,22 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 		return models.TrainingPlan{}, result.Error
 	}
 	return training, nil
+}
+
+func (repo TrainingRepository) DeleteTrainingPlan(ctx context.Context, trainingID string) error {
+	db := repo.db.WithContext(ctx)
+	u64, err := strconv.ParseUint(trainingID, 10, 32)
+	if err != nil {
+		return err
+	}
+	id := uint(u64)
+	result := db.Select("Exercises").Delete(&models.TrainingPlan{ID: id})
+	if result.Error != nil {
+		repo.logger.Error("Unable to delete training plan", zap.Error(result.Error))
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return contracts.ErrTrainingPlanNotFound
+	}
+	return nil
 }

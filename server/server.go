@@ -24,6 +24,7 @@ type Server struct {
 	deleteExercise handlers.DeleteExercise
 	updateExercise handlers.UpdateExercise
 	getExercise    handlers.GetExercise
+	deleteTraining handlers.DeleteTraining
 }
 
 func (s *Server) Run() {
@@ -67,6 +68,7 @@ func NewServer() *Server {
 	createTrainingUc := trainings.NewTrainingCreatorImpl(trainingRepo, userRepo, logger)
 	getTrainingUc := trainings.NewTrainingGetterImpl(trainingRepo, firebaseRepo, logger)
 	updateTrainingUc := trainings.NewTrainingUpdaterImpl(trainingRepo, firebaseRepo, logger)
+	deleteTrainingUc := trainings.NewTrainingDeleterImpl(trainingRepo, logger)
 
 	createExerciseUc := exercises.NewExerciseCreatorImpl(trainingRepo, exerciseRepo, logger)
 	deleteExerciseUc := exercises.NewExerciseDeleterImpl(trainingRepo, exerciseRepo, logger)
@@ -77,6 +79,7 @@ func NewServer() *Server {
 	createTraining := handlers.NewCreateTraining(&createTrainingUc, logger)
 	getTrainings := handlers.NewGetTrainings(&getTrainingUc, logger)
 	updateTraining := handlers.NewUpdateTraining(&updateTrainingUc, logger)
+	deleteTraining := handlers.NewDeleteTraining(&deleteTrainingUc, logger)
 
 	createExercise := handlers.NewCreateExercise(&createExerciseUc, logger)
 	deleteExercise := handlers.NewDeleteExercise(&deleteExerciseUc, logger)
@@ -92,5 +95,6 @@ func NewServer() *Server {
 		deleteExercise: deleteExercise,
 		updateExercise: updateExercise,
 		getExercise:    getExercise,
+		deleteTraining: deleteTraining,
 	}
 }

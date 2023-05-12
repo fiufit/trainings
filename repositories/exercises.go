@@ -14,8 +14,8 @@ import (
 //go:generate mockery --name Exercises
 type Exercises interface {
 	CreateExercise(ctx context.Context, exercise models.Exercise) (models.Exercise, error)
-	DeleteExercise(ctx context.Context, exerciseID string) error
-	GetExerciseByID(ctx context.Context, exerciseID string) (models.Exercise, error)
+	DeleteExercise(ctx context.Context, exerciseID uint) error
+	GetExerciseByID(ctx context.Context, exerciseID uint) (models.Exercise, error)
 	UpdateExercise(ctx context.Context, exercise models.Exercise) (models.Exercise, error)
 }
 
@@ -38,7 +38,7 @@ func (repo ExerciseRepository) CreateExercise(ctx context.Context, exercise mode
 	return exercise, nil
 }
 
-func (repo ExerciseRepository) DeleteExercise(ctx context.Context, exerciseID string) error {
+func (repo ExerciseRepository) DeleteExercise(ctx context.Context, exerciseID uint) error {
 	db := repo.db.WithContext(ctx)
 	var exercise models.Exercise
 	result := db.Delete(&exercise, "id = ?", exerciseID)
@@ -52,7 +52,7 @@ func (repo ExerciseRepository) DeleteExercise(ctx context.Context, exerciseID st
 	return nil
 }
 
-func (repo ExerciseRepository) GetExerciseByID(ctx context.Context, exerciseID string) (models.Exercise, error) {
+func (repo ExerciseRepository) GetExerciseByID(ctx context.Context, exerciseID uint) (models.Exercise, error) {
 	db := repo.db.WithContext(ctx)
 	var exercise models.Exercise
 	result := db.First(&exercise, "id = ?", exerciseID)
@@ -60,7 +60,7 @@ func (repo ExerciseRepository) GetExerciseByID(ctx context.Context, exerciseID s
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return models.Exercise{}, contracts.ErrExerciseNotFound
 		}
-		repo.logger.Error("Unable to get exercise", zap.Error(result.Error), zap.String("ID", exerciseID))
+		repo.logger.Error("Unable to get exercise", zap.Error(result.Error), zap.Uint("ID", exerciseID))
 		return models.Exercise{}, result.Error
 	}
 

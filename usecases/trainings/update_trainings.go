@@ -61,7 +61,7 @@ func (uc *TrainingUpdaterImpl) patchTrainingModel(ctx context.Context, training 
 	return training, nil
 }
 
-func (uc *TrainingUpdaterImpl) getTrainingPlan(ctx context.Context, trainingID string, trainerID string) (models.TrainingPlan, error) {
+func (uc *TrainingUpdaterImpl) getTrainingPlan(ctx context.Context, trainingID uint, trainerID string) (models.TrainingPlan, error) {
 	training, err := uc.trainings.GetTrainingByID(ctx, trainingID)
 	if err != nil {
 		return models.TrainingPlan{}, err

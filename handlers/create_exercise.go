@@ -29,7 +29,7 @@ func (h CreateExercise) Handle() gin.HandlerFunc {
 			return
 		}
 
-		trainingID := ctx.MustGet("trainingID").(string)
+		trainingID := ctx.MustGet("trainingID").(uint)
 		req.TrainingPlanID = trainingID
 
 		res, err := h.exercises.CreateExercise(ctx, req)

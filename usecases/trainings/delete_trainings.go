@@ -2,7 +2,6 @@ package trainings
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/contracts/training"
@@ -31,10 +30,5 @@ func (uc *TrainingDeleterImpl) DeleteTraining(ctx context.Context, req training.
 	if training.TrainerID != req.TrainerID {
 		return contracts.ErrUnauthorizedTrainer
 	}
-	u64, err := strconv.ParseUint(req.TrainingPlanID, 10, 32)
-	if err != nil {
-		return err
-	}
-	trainingID := uint(u64)
-	return uc.trainings.DeleteTrainingPlan(ctx, trainingID)
+	return uc.trainings.DeleteTrainingPlan(ctx, req.TrainingPlanID)
 }

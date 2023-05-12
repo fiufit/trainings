@@ -17,7 +17,7 @@ import (
 //go:generate mockery --name TrainingPlans
 type TrainingPlans interface {
 	CreateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
-	GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error)
+	GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error)
 	GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error)
 	UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
 	DeleteTrainingPlan(ctx context.Context, trainingID uint) error
@@ -45,15 +45,15 @@ func (repo TrainingRepository) CreateTrainingPlan(ctx context.Context, training 
 	return training, nil
 }
 
-func (repo TrainingRepository) GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error) {
+func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error) {
 	db := repo.db.WithContext(ctx)
 	var training models.TrainingPlan
-	result := db.Preload("Exercises").First(&training, "id = ?", id)
+	result := db.Preload("Exercises").First(&training, "id = ?", trainingID)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return models.TrainingPlan{}, contracts.ErrTrainingPlanNotFound
 		}
-		repo.logger.Error("Unable to get training plan", zap.Error(result.Error), zap.String("ID", id))
+		repo.logger.Error("Unable to get training plan", zap.Error(result.Error), zap.Uint("ID", trainingID))
 		return models.TrainingPlan{}, result.Error
 	}
 

@@ -2,7 +2,6 @@ package exercises
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/contracts/training"
@@ -33,12 +32,8 @@ func (uc *ExerciseCreatorImpl) CreateExercise(ctx context.Context, req training.
 	if training.TrainerID != req.TrainerID {
 		return models.Exercise{}, contracts.ErrUnauthorizedTrainer
 	}
-	trainingID, err := strconv.Atoi(req.TrainingPlanID)
-	if err != nil {
-		return models.Exercise{}, err
-	}
 	newExercise := models.Exercise{
-		TrainingPlanID: uint(trainingID),
+		TrainingPlanID: req.TrainingPlanID,
 		Title:          req.Title,
 		Description:    req.Description,
 	}

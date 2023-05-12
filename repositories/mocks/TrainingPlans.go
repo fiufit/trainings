@@ -54,23 +54,23 @@ func (_m *TrainingPlans) DeleteTrainingPlan(ctx context.Context, trainingID uint
 	return r0
 }
 
-// GetTrainingByID provides a mock function with given fields: ctx, id
-func (_m *TrainingPlans) GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error) {
-	ret := _m.Called(ctx, id)
+// GetTrainingByID provides a mock function with given fields: ctx, trainingID
+func (_m *TrainingPlans) GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error) {
+	ret := _m.Called(ctx, trainingID)
 
 	var r0 models.TrainingPlan
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (models.TrainingPlan, error)); ok {
-		return rf(ctx, id)
+	if rf, ok := ret.Get(0).(func(context.Context, uint) (models.TrainingPlan, error)); ok {
+		return rf(ctx, trainingID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) models.TrainingPlan); ok {
-		r0 = rf(ctx, id)
+	if rf, ok := ret.Get(0).(func(context.Context, uint) models.TrainingPlan); ok {
+		r0 = rf(ctx, trainingID)
 	} else {
 		r0 = ret.Get(0).(models.TrainingPlan)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, id)
+	if rf, ok := ret.Get(1).(func(context.Context, uint) error); ok {
+		r1 = rf(ctx, trainingID)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -2,7 +2,6 @@ package trainings
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/fiufit/trainings/contracts/training"
 	"github.com/fiufit/trainings/models"
@@ -12,7 +11,7 @@ import (
 
 type TrainingGetter interface {
 	GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error)
-	GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error)
+	GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error)
 }
 
 type TrainingGetterImpl struct {
@@ -36,8 +35,8 @@ func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req training
 	return res, nil
 }
 
-func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, id string) (models.TrainingPlan, error) {
-	training, err := uc.trainings.GetTrainingByID(ctx, id)
+func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error) {
+	training, err := uc.trainings.GetTrainingByID(ctx, trainingID)
 	if err != nil {
 		return training, err
 	}
@@ -46,7 +45,6 @@ func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, id string) (m
 }
 
 func (uc *TrainingGetterImpl) fillTrainingPicture(ctx context.Context, training *models.TrainingPlan) {
-	trainingID := strconv.FormatUint(uint64(training.ID), 10)
-	trainingPictureUrl := uc.firebase.GetTrainingPictureUrl(ctx, trainingID, training.TrainerID)
+	trainingPictureUrl := uc.firebase.GetTrainingPictureUrl(ctx, training.ID, training.TrainerID)
 	(*training).PictureUrl = trainingPictureUrl
 }

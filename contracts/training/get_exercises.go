@@ -1,6 +1,6 @@
 package training
 
 type GetExerciseRequest struct {
-	TrainingPlanID string
-	ExerciseID     string
+	TrainingPlanID uint
+	ExerciseID     uint
 }

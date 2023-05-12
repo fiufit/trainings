@@ -24,8 +24,8 @@ func (h GetExercise) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req training.GetExerciseRequest
 
-		trainingID := ctx.MustGet("trainingID").(string)
-		exerciseID := ctx.MustGet("exerciseID").(string)
+		trainingID := ctx.MustGet("trainingID").(uint)
+		exerciseID := ctx.MustGet("exerciseID").(uint)
 		req.TrainingPlanID = trainingID
 		req.ExerciseID = exerciseID
 		exercise, err := h.exercises.GetExerciseByID(ctx, req)

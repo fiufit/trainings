@@ -41,11 +41,11 @@ func (_m *TrainingPlans) CreateTrainingPlan(ctx context.Context, _a1 models.Trai
 }
 
 // DeleteTrainingPlan provides a mock function with given fields: ctx, trainingID
-func (_m *TrainingPlans) DeleteTrainingPlan(ctx context.Context, trainingID string) error {
+func (_m *TrainingPlans) DeleteTrainingPlan(ctx context.Context, trainingID uint) error {
 	ret := _m.Called(ctx, trainingID)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint) error); ok {
 		r0 = rf(ctx, trainingID)
 	} else {
 		r0 = ret.Error(0)

@@ -8,7 +8,7 @@ import (
 )
 
 type ExerciseID struct {
-	ExerciseID string `uri:"exerciseID" binding:"required"`
+	ExerciseID uint `uri:"exerciseID" binding:"required"`
 }
 
 func BindExerciseIDFromUri() gin.HandlerFunc {

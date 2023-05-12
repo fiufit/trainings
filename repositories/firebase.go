@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -13,7 +14,7 @@ import (
 )
 
 type Firebase interface {
-	GetTrainingPictureUrl(ctx context.Context, trainingID string, trainerID string) string
+	GetTrainingPictureUrl(ctx context.Context, trainingID uint, trainerID string) string
 }
 
 type FirebaseRepository struct {
@@ -57,14 +58,15 @@ func NewFirebaseRepository(logger *zap.Logger, sdkJson []byte, storageBucketName
 	return repo, nil
 }
 
-func (repo FirebaseRepository) GetTrainingPictureUrl(ctx context.Context, trainingID string, trainerID string) string {
+func (repo FirebaseRepository) GetTrainingPictureUrl(ctx context.Context, trainingID uint, trainerID string) string {
 	defaultPicturePath := "training_pictures/default.png"
-	trainingPicturePath := "training_pictures/" + trainerID + "/" + trainingID + "/training.png"
+	training := strconv.FormatUint(uint64(trainingID), 10)
+	trainingPicturePath := "training_pictures/" + trainerID + "/" + training + "/training.png"
 	pictureHandle := repo.storageBucket.Object(trainingPicturePath)
 	_, err := pictureHandle.Attrs(ctx)
 	if err != nil {
 		if !errors.Is(err, storage.ErrObjectNotExist) {
-			repo.logger.Error("Unable to retrieve training picture from firebase storage", zap.String("trainingID", trainingID))
+			repo.logger.Error("Unable to retrieve training picture from firebase storage", zap.String("trainingID", training))
 		}
 		trainingPicturePath = defaultPicturePath
 	}
@@ -76,7 +78,7 @@ func (repo FirebaseRepository) GetTrainingPictureUrl(ctx context.Context, traini
 	pictureUrl, err := repo.storageBucket.SignedURL(trainingPicturePath, &opts)
 	if err != nil {
 		pictureUrl = ""
-		repo.logger.Error("Unable to sign training picture from firebase storage", zap.String("trainingID", trainingID))
+		repo.logger.Error("Unable to sign training picture from firebase storage", zap.String("trainingID", training))
 	}
 	return pictureUrl
 }

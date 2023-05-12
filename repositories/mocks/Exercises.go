@@ -39,11 +39,11 @@ func (_m *Exercises) CreateExercise(ctx context.Context, exercise models.Exercis
 }
 
 // DeleteExercise provides a mock function with given fields: ctx, exerciseID
-func (_m *Exercises) DeleteExercise(ctx context.Context, exerciseID string) error {
+func (_m *Exercises) DeleteExercise(ctx context.Context, exerciseID uint) error {
 	ret := _m.Called(ctx, exerciseID)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint) error); ok {
 		r0 = rf(ctx, exerciseID)
 	} else {
 		r0 = ret.Error(0)
@@ -53,21 +53,21 @@ func (_m *Exercises) DeleteExercise(ctx context.Context, exerciseID string) erro
 }
 
 // GetExerciseByID provides a mock function with given fields: ctx, exerciseID
-func (_m *Exercises) GetExerciseByID(ctx context.Context, exerciseID string) (models.Exercise, error) {
+func (_m *Exercises) GetExerciseByID(ctx context.Context, exerciseID uint) (models.Exercise, error) {
 	ret := _m.Called(ctx, exerciseID)
 
 	var r0 models.Exercise
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (models.Exercise, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint) (models.Exercise, error)); ok {
 		return rf(ctx, exerciseID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) models.Exercise); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uint) models.Exercise); ok {
 		r0 = rf(ctx, exerciseID)
 	} else {
 		r0 = ret.Get(0).(models.Exercise)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uint) error); ok {
 		r1 = rf(ctx, exerciseID)
 	} else {
 		r1 = ret.Error(1)

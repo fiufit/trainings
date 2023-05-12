@@ -6,23 +6,23 @@ import (
 
 	"github.com/fiufit/trainings/contracts"
 	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/usecases/exercises"
+	"github.com/fiufit/trainings/usecases/trainings"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type CreateExercise struct {
-	exercises exercises.ExerciseCreator
+type DeleteTraining struct {
+	trainings trainings.TrainingDeleter
 	logger    *zap.Logger
 }
 
-func NewCreateExercise(exercises exercises.ExerciseCreator, logger *zap.Logger) CreateExercise {
-	return CreateExercise{exercises: exercises, logger: logger}
+func NewDeleteTraining(trainings trainings.TrainingDeleter, logger *zap.Logger) DeleteTraining {
+	return DeleteTraining{trainings: trainings, logger: logger}
 }
 
-func (h CreateExercise) Handle() gin.HandlerFunc {
+func (h DeleteTraining) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req training.CreateExerciseRequest
+		var req training.DeleteTrainingRequest
 		err := ctx.ShouldBindJSON(&req)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
@@ -32,21 +32,19 @@ func (h CreateExercise) Handle() gin.HandlerFunc {
 		trainingID := ctx.MustGet("trainingID").(uint)
 		req.TrainingPlanID = trainingID
 
-		res, err := h.exercises.CreateExercise(ctx, req)
+		err = h.trainings.DeleteTraining(ctx, req)
 		if err != nil {
-			if errors.Is(err, contracts.ErrTrainingPlanNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
-				return
-			}
 			if errors.Is(err, contracts.ErrUnauthorizedTrainer) {
 				ctx.JSON(http.StatusUnauthorized, contracts.FormatErrResponse(err))
+				return
+			}
+			if errors.Is(err, contracts.ErrTrainingPlanNotFound) {
+				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
 				return
 			}
 			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
 			return
 		}
-
-		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(res))
-
+		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(""))
 	}
 }

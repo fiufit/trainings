@@ -29,8 +29,8 @@ func (h UpdateExercise) Handle() gin.HandlerFunc {
 			return
 		}
 
-		trainingID := ctx.MustGet("trainingID").(string)
-		exerciseID := ctx.MustGet("exerciseID").(string)
+		trainingID := ctx.MustGet("trainingID").(uint)
+		exerciseID := ctx.MustGet("exerciseID").(uint)
 		req.TrainingPlanID = trainingID
 		req.ExerciseID = exerciseID
 

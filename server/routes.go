@@ -27,6 +27,10 @@ func (s *Server) InitTrainingRoutes(router *gin.RouterGroup) {
 	router.PATCH("/:trainingID", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.updateTraining.Handle(),
 	}))
+
+	router.DELETE("/:trainingID", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.deleteTraining.Handle(),
+	}))
 }
 
 func (s *Server) InitExerciseRouter(router *gin.RouterGroup) {

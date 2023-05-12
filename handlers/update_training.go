@@ -29,7 +29,7 @@ func (h UpdateTraining) Handle() gin.HandlerFunc {
 			return
 		}
 
-		trainingID := ctx.MustGet("trainingID").(string)
+		trainingID := ctx.MustGet("trainingID").(uint)
 		req.ID = trainingID
 
 		updatedTraining, err := h.trainings.UpdateTrainingPlan(ctx, req)

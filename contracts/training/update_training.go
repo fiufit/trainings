@@ -3,7 +3,7 @@ package training
 import "github.com/fiufit/trainings/models"
 
 type UpdateTrainingRequest struct {
-	ID          string
+	ID          uint
 	TrainerID   string `json:"trainer_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`

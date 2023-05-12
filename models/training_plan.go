@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type TrainingPlan struct {
 	ID          uint   `gorm:"primaryKey;not null"`
@@ -9,7 +13,8 @@ type TrainingPlan struct {
 	Difficulty  string `gorm:"not null"`
 	Duration    uint   `gorm:"not null"`
 	TrainerID   string
-	CreatedAt   time.Time  `gorm:"not null"`
+	CreatedAt   time.Time `gorm:"not null"`
+	DeletedAt   gorm.DeletedAt
 	Exercises   []Exercise `gorm:"foreignKey:TrainingPlanID"`
 	PictureUrl  string     `gorm:"-"`
 }

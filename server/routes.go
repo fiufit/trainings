@@ -9,9 +9,11 @@ func (s *Server) InitRoutes() {
 	baseRouter := s.router.Group("/:version")
 	trainingRouter := baseRouter.Group("/trainings")
 	exerciseRouter := trainingRouter.Group("/:trainingID/exercises")
+	reviewRouter := trainingRouter.Group("/:trainingID/reviews")
 
 	s.InitTrainingRoutes(trainingRouter)
-	s.InitExerciseRouter(exerciseRouter)
+	s.InitExerciseRoutes(exerciseRouter)
+	s.InitReviewRoutes(reviewRouter)
 
 }
 
@@ -33,7 +35,7 @@ func (s *Server) InitTrainingRoutes(router *gin.RouterGroup) {
 	}))
 }
 
-func (s *Server) InitExerciseRouter(router *gin.RouterGroup) {
+func (s *Server) InitExerciseRoutes(router *gin.RouterGroup) {
 	router.POST("", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.createExercise.Handle(),
 	}))
@@ -49,4 +51,27 @@ func (s *Server) InitExerciseRouter(router *gin.RouterGroup) {
 	router.GET("/:exerciseID", middleware.BindTrainingIDFromUri(), middleware.BindExerciseIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.getExercise.Handle(),
 	}))
+}
+
+func (s *Server) InitReviewRoutes(router *gin.RouterGroup) {
+	router.POST("", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.createReview.Handle(),
+	}))
+
+	router.GET("", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getReviews.Handle(),
+	}))
+
+	router.GET("/:reviewID", middleware.BindTrainingIDFromUri(), middleware.BindReviewIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getReviewByID.Handle(),
+	}))
+
+	router.PATCH("/:reviewID", middleware.BindTrainingIDFromUri(), middleware.BindReviewIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.updateReview.Handle(),
+	}))
+
+	router.DELETE("/:reviewID", middleware.BindTrainingIDFromUri(), middleware.BindReviewIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.deleteReview.Handle(),
+	}))
+
 }

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/contracts/users"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories/mocks"
@@ -25,16 +25,16 @@ func TestCreateTrainingOk(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req := training.CreateTrainingRequest{
+	req := trainings.CreateTrainingRequest{
 		Name:        "Test Name",
 		Description: "Test Description",
 		TrainerID:   "Test Trainer",
-		Exercises:   []training.ExerciseRequest{},
+		Exercises:   []trainings.ExerciseRequest{},
 	}
 	trainingRepo := new(mocks.TrainingPlans)
 	userRepo := new(mocks.Users)
 
-	training := training.ConverToTrainingPlan(req)
+	training := trainings.ConverToTrainingPlan(req)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(training, nil)
 	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(users.GetUserResponse{}, nil)
 
@@ -48,16 +48,16 @@ func TestCreateTrainingOk(t *testing.T) {
 func TestCreateTrainingError(t *testing.T) {
 
 	ctx := context.Background()
-	req := training.CreateTrainingRequest{
+	req := trainings.CreateTrainingRequest{
 		Name:        "Test Name",
 		Description: "Test Description",
 		TrainerID:   "Test Trainer",
-		Exercises:   []training.ExerciseRequest{},
+		Exercises:   []trainings.ExerciseRequest{},
 	}
 	trainingRepo := new(mocks.TrainingPlans)
 	userRepo := new(mocks.Users)
 
-	training := training.ConverToTrainingPlan(req)
+	training := trainings.ConverToTrainingPlan(req)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(models.TrainingPlan{}, errors.New("repo error"))
 	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(users.GetUserResponse{}, nil)
 

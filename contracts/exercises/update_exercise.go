@@ -1,4 +1,4 @@
-package training
+package exercises
 
 type UpdateExerciseRequest struct {
 	Title          string `json:"title"`

@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"go.uber.org/zap"
 )
 
 type TrainingUpdater interface {
-	UpdateTrainingPlan(ctx context.Context, req training.UpdateTrainingRequest) (models.TrainingPlan, error)
+	UpdateTrainingPlan(ctx context.Context, req trainings.UpdateTrainingRequest) (models.TrainingPlan, error)
 }
 
 type TrainingUpdaterImpl struct {
@@ -24,7 +24,7 @@ func NewTrainingUpdaterImpl(trainings repositories.TrainingPlans, firebase repos
 	return TrainingUpdaterImpl{trainings: trainings, firebase: firebase, logger: logger}
 }
 
-func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req training.UpdateTrainingRequest) (models.TrainingPlan, error) {
+func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req trainings.UpdateTrainingRequest) (models.TrainingPlan, error) {
 	training, err := uc.getTrainingPlan(ctx, req.ID, req.TrainerID)
 	if err != nil {
 		return models.TrainingPlan{}, err
@@ -41,7 +41,7 @@ func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req train
 	return updatedTraining, nil
 }
 
-func (uc *TrainingUpdaterImpl) patchTrainingModel(ctx context.Context, training models.TrainingPlan, req training.UpdateTrainingRequest) (models.TrainingPlan, error) {
+func (uc *TrainingUpdaterImpl) patchTrainingModel(ctx context.Context, training models.TrainingPlan, req trainings.UpdateTrainingRequest) (models.TrainingPlan, error) {
 	if req.Name != "" {
 		training.Name = req.Name
 	}

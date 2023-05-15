@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/database"
 	"github.com/fiufit/trainings/models"
 	"go.uber.org/zap"
@@ -18,7 +18,7 @@ import (
 type TrainingPlans interface {
 	CreateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
 	GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error)
-	GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error)
+	GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
 	UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
 	DeleteTrainingPlan(ctx context.Context, trainingID uint) error
 }
@@ -60,7 +60,7 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 	return training, nil
 }
 
-func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error) {
+func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error) {
 	var res []models.TrainingPlan
 	db := repo.db.WithContext(ctx)
 
@@ -89,10 +89,10 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Find(&res)
 	if result.Error != nil {
 		repo.logger.Error("Unable to get training plans with pagination", zap.Error(result.Error), zap.Any("request", req))
-		return training.GetTrainingsResponse{}, result.Error
+		return trainings.GetTrainingsResponse{}, result.Error
 	}
 
-	return training.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
+	return trainings.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
 }
 
 func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error) {

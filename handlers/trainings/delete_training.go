@@ -5,24 +5,24 @@ import (
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/usecases/trainings"
+	"github.com/fiufit/trainings/contracts/trainings"
+	utrainings "github.com/fiufit/trainings/usecases/trainings"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type DeleteTraining struct {
-	trainings trainings.TrainingDeleter
+	trainings utrainings.TrainingDeleter
 	logger    *zap.Logger
 }
 
-func NewDeleteTraining(trainings trainings.TrainingDeleter, logger *zap.Logger) DeleteTraining {
+func NewDeleteTraining(trainings utrainings.TrainingDeleter, logger *zap.Logger) DeleteTraining {
 	return DeleteTraining{trainings: trainings, logger: logger}
 }
 
 func (h DeleteTraining) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req training.DeleteTrainingRequest
+		var req trainings.DeleteTrainingRequest
 		err := ctx.ShouldBindJSON(&req)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))

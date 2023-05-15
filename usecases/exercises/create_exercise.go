@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/exercises"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"go.uber.org/zap"
 )
 
 type ExerciseCreator interface {
-	CreateExercise(ctx context.Context, req training.CreateExerciseRequest) (models.Exercise, error)
+	CreateExercise(ctx context.Context, req exercises.CreateExerciseRequest) (models.Exercise, error)
 }
 
 type ExerciseCreatorImpl struct {
@@ -24,7 +24,7 @@ func NewExerciseCreatorImpl(trainings repositories.TrainingPlans, exercises repo
 	return ExerciseCreatorImpl{trainings: trainings, exercises: exercises, logger: logger}
 }
 
-func (uc *ExerciseCreatorImpl) CreateExercise(ctx context.Context, req training.CreateExerciseRequest) (models.Exercise, error) {
+func (uc *ExerciseCreatorImpl) CreateExercise(ctx context.Context, req exercises.CreateExerciseRequest) (models.Exercise, error) {
 	training, err := uc.trainings.GetTrainingByID(ctx, req.TrainingPlanID)
 	if err != nil {
 		return models.Exercise{}, err

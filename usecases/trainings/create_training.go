@@ -3,13 +3,13 @@ package trainings
 import (
 	"context"
 
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/repositories"
 	"go.uber.org/zap"
 )
 
 type TrainingCreator interface {
-	CreateTraining(ctx context.Context, req training.CreateTrainingRequest) (training.CreateTrainingResponse, error)
+	CreateTraining(ctx context.Context, req trainings.CreateTrainingRequest) (trainings.CreateTrainingResponse, error)
 }
 
 type TrainingCreatorImpl struct {
@@ -22,12 +22,12 @@ func NewTrainingCreatorImpl(trainings repositories.TrainingPlans, users reposito
 	return TrainingCreatorImpl{trainings: trainings, users: users, logger: logger}
 }
 
-func (uc *TrainingCreatorImpl) CreateTraining(ctx context.Context, req training.CreateTrainingRequest) (training.CreateTrainingResponse, error) {
+func (uc *TrainingCreatorImpl) CreateTraining(ctx context.Context, req trainings.CreateTrainingRequest) (trainings.CreateTrainingResponse, error) {
 	_, err := uc.users.GetUserByID(ctx, req.TrainerID)
 	if err != nil {
-		return training.CreateTrainingResponse{}, err
+		return trainings.CreateTrainingResponse{}, err
 	}
-	newTraining := training.ConverToTrainingPlan(req)
+	newTraining := trainings.ConverToTrainingPlan(req)
 	createdTraining, err := uc.trainings.CreateTrainingPlan(ctx, newTraining)
-	return training.CreateTrainingResponse{TrainingPlan: createdTraining}, err
+	return trainings.CreateTrainingResponse{TrainingPlan: createdTraining}, err
 }

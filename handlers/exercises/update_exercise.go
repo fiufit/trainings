@@ -5,24 +5,24 @@ import (
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/usecases/exercises"
+	"github.com/fiufit/trainings/contracts/exercises"
+	uexercises "github.com/fiufit/trainings/usecases/exercises"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type UpdateExercise struct {
-	exercises exercises.ExerciseUpdater
+	exercises uexercises.ExerciseUpdater
 	logger    *zap.Logger
 }
 
-func NewUpdateExercise(exercises exercises.ExerciseUpdater, logger *zap.Logger) UpdateExercise {
+func NewUpdateExercise(exercises uexercises.ExerciseUpdater, logger *zap.Logger) UpdateExercise {
 	return UpdateExercise{exercises: exercises, logger: logger}
 }
 
 func (h UpdateExercise) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req training.UpdateExerciseRequest
+		var req exercises.UpdateExerciseRequest
 		err := ctx.ShouldBindJSON(&req)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))

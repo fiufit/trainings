@@ -3,14 +3,14 @@ package trainings
 import (
 	"context"
 
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"go.uber.org/zap"
 )
 
 type TrainingGetter interface {
-	GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error)
+	GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
 	GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error)
 }
 
@@ -24,7 +24,7 @@ func NewTrainingGetterImpl(trainings repositories.TrainingPlans, firebase reposi
 	return TrainingGetterImpl{trainings: trainings, firebase: firebase, logger: logger}
 }
 
-func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error) {
+func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error) {
 	res, err := uc.trainings.GetTrainingPlans(ctx, req)
 	if err != nil {
 		return res, err

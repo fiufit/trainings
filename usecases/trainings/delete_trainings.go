@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/repositories"
 	"go.uber.org/zap"
 )
 
 type TrainingDeleter interface {
-	DeleteTraining(ctx context.Context, req training.DeleteTrainingRequest) error
+	DeleteTraining(ctx context.Context, req trainings.DeleteTrainingRequest) error
 }
 
 type TrainingDeleterImpl struct {
@@ -22,7 +22,7 @@ func NewTrainingDeleterImpl(trainings repositories.TrainingPlans, logger *zap.Lo
 	return TrainingDeleterImpl{trainings: trainings, logger: logger}
 }
 
-func (uc *TrainingDeleterImpl) DeleteTraining(ctx context.Context, req training.DeleteTrainingRequest) error {
+func (uc *TrainingDeleterImpl) DeleteTraining(ctx context.Context, req trainings.DeleteTrainingRequest) error {
 	training, err := uc.trainings.GetTrainingByID(ctx, req.TrainingPlanID)
 	if err != nil {
 		return err

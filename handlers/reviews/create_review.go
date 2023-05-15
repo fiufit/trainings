@@ -51,6 +51,10 @@ func (h CreateReview) Handle() gin.HandlerFunc {
 				ctx.JSON(http.StatusConflict, contracts.FormatErrResponse(err))
 				return
 			}
+			if errors.Is(err, contracts.ErrUserNotFound) {
+				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
+				return
+			}
 			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
 			return
 		}

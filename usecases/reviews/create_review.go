@@ -15,16 +15,21 @@ type ReviewCreator interface {
 }
 
 type ReviewCreatorImpl struct {
+	users     repositories.Users
 	trainings repositories.TrainingPlans
 	reviews   repositories.Reviews
 	logger    *zap.Logger
 }
 
-func NewReviewCreatorImpl(trainings repositories.TrainingPlans, reviews repositories.Reviews, logger *zap.Logger) ReviewCreatorImpl {
-	return ReviewCreatorImpl{trainings: trainings, reviews: reviews, logger: logger}
+func NewReviewCreatorImpl(trainings repositories.TrainingPlans, reviews repositories.Reviews, users repositories.Users, logger *zap.Logger) ReviewCreatorImpl {
+	return ReviewCreatorImpl{trainings: trainings, reviews: reviews, users: users, logger: logger}
 }
 
 func (uc *ReviewCreatorImpl) CreateReview(ctx context.Context, req reviews.CreateReviewRequest) (models.Review, error) {
+	_, err := uc.users.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		return models.Review{}, err
+	}
 	training, err := uc.trainings.GetTrainingByID(ctx, req.TrainingPlanID)
 	if err != nil {
 		return models.Review{}, err

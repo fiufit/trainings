@@ -12,6 +12,7 @@ import (
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"github.com/fiufit/trainings/usecases/exercises"
+	"github.com/fiufit/trainings/usecases/reviews"
 	"github.com/fiufit/trainings/usecases/trainings"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -47,7 +48,7 @@ func NewServer() *Server {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{})
+	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{}, &models.Review{})
 	if err != nil {
 		panic(err)
 	}
@@ -66,6 +67,7 @@ func NewServer() *Server {
 	trainingRepo := repositories.NewTrainingRepository(db, logger)
 	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
 	exerciseRepo := repositories.NewExerciseRepository(db, logger)
+	reviewRepo := repositories.NewReviewRepository(db, logger)
 	firebaseRepo, err := repositories.NewFirebaseRepository(logger, sdkJson, bucketName)
 	if err != nil {
 		panic(err)
@@ -82,6 +84,8 @@ func NewServer() *Server {
 	updateExerciseUc := exercises.NewExerciseUpdaterImpl(trainingRepo, exerciseRepo, logger)
 	getExerciseUc := exercises.NewExerciseGetterImpl(trainingRepo, exerciseRepo, logger)
 
+	createReviewUc := reviews.NewReviewCreatorImpl(trainingRepo, reviewRepo, logger)
+
 	// HANDLERS
 	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)
 	getTrainings := trainingHandlers.NewGetTrainings(&getTrainingUc, logger)
@@ -93,6 +97,8 @@ func NewServer() *Server {
 	updateExercise := exerciseHandlers.NewUpdateExercise(&updateExerciseUc, logger)
 	getExercise := exerciseHandlers.NewGetExercises(&getExerciseUc, logger)
 
+	createReview := reviewHandlers.NewCreateReview(&createReviewUc, logger)
+
 	return &Server{
 		router:         gin.Default(),
 		createTraining: createTraining,
@@ -103,5 +109,6 @@ func NewServer() *Server {
 		updateExercise: updateExercise,
 		getExercise:    getExercise,
 		deleteTraining: deleteTraining,
+		createReview:   createReview,
 	}
 }

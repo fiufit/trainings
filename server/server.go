@@ -84,8 +84,10 @@ func NewServer() *Server {
 	updateExerciseUc := exercises.NewExerciseUpdaterImpl(trainingRepo, exerciseRepo, logger)
 	getExerciseUc := exercises.NewExerciseGetterImpl(trainingRepo, exerciseRepo, logger)
 
-	createReviewUc := reviews.NewReviewCreatorImpl(trainingRepo, reviewRepo, logger)
+	createReviewUc := reviews.NewReviewCreatorImpl(trainingRepo, reviewRepo, userRepo, logger)
 	getReviewUc := reviews.NewReviewGetterImpl(trainingRepo, reviewRepo, logger)
+	updateReviewUc := reviews.NewReviewUpdaterImpl(trainingRepo, reviewRepo, logger)
+	deleteReviewUc := reviews.NewReviewDeleterImpl(trainingRepo, reviewRepo, logger)
 
 	// HANDLERS
 	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)
@@ -101,6 +103,8 @@ func NewServer() *Server {
 	createReview := reviewHandlers.NewCreateReview(&createReviewUc, logger)
 	getReviews := reviewHandlers.NewGetReviews(&getReviewUc, logger)
 	getReviewByID := reviewHandlers.NewGetReviewByID(&getReviewUc, logger)
+	updateReview := reviewHandlers.NewUpdateReview(&updateReviewUc, logger)
+	deleteReview := reviewHandlers.NewDeleteReview(&deleteReviewUc, logger)
 
 	return &Server{
 		router:         gin.Default(),
@@ -115,5 +119,7 @@ func NewServer() *Server {
 		createReview:   createReview,
 		getReviews:     getReviews,
 		getReviewByID:  getReviewByID,
+		updateReview:   updateReview,
+		deleteReview:   deleteReview,
 	}
 }

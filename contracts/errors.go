@@ -15,4 +15,5 @@ var (
 	ErrSelfReview           = errors.New("user is not allowed to review their own training")
 	ErrReviewAlreadyExists  = errors.New("user already reviewed the training")
 	ErrReviewNotFound       = errors.New("review not found")
+	ErrUnauthorizedReviewer = errors.New("user is not the review creator")
 )

@@ -17,7 +17,7 @@ import (
 type Reviews interface {
 	CreateReview(ctx context.Context, review models.Review) (models.Review, error)
 	UpdateReview(ctx context.Context, review models.Review) (models.Review, error)
-	DeleteReview(ctx context.Context, review models.Review) error
+	DeleteReview(ctx context.Context, reviewID uint) error
 	GetReviewByID(ctx context.Context, reviewID uint) (models.Review, error)
 	GetReviews(ctx context.Context, req reviews.GetReviewsRequest) (reviews.GetReviewsResponse, error)
 }
@@ -48,10 +48,29 @@ func (repo ReviewRepository) CreateReview(ctx context.Context, review models.Rev
 }
 
 func (repo ReviewRepository) UpdateReview(ctx context.Context, review models.Review) (models.Review, error) {
-	return models.Review{}, nil
+	db := repo.db.WithContext(ctx)
+	result := db.Save(&review)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return models.Review{}, contracts.ErrReviewNotFound
+		}
+		repo.logger.Error("Unable to update review", zap.Error(result.Error), zap.Any("review", review))
+		return models.Review{}, result.Error
+	}
+	return review, nil
 }
 
-func (repo ReviewRepository) DeleteReview(ctx context.Context, review models.Review) error {
+func (repo ReviewRepository) DeleteReview(ctx context.Context, reviewID uint) error {
+	db := repo.db.WithContext(ctx)
+	var review models.Review
+	result := db.Delete(&review, "id = ?", reviewID)
+	if result.Error != nil {
+		repo.logger.Error("Unable to delete review", zap.Error(result.Error), zap.Any("review", review))
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return contracts.ErrReviewNotFound
+	}
 	return nil
 }
 

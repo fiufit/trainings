@@ -8,6 +8,7 @@ var errCodes = map[error]string{
 	ErrUnauthorizedTrainer:  "T4",
 	ErrSelfReview:           "T5",
 	ErrReviewAlreadyExists:  "T6",
+	ErrReviewNotFound:       "T7",
 	ErrUserInternal:         "U0",
 	ErrUserBadRequest:       "U1",
 	ErrUserNotFound:         "U2",

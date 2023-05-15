@@ -12,7 +12,7 @@ type CreateReviewRequest struct {
 }
 
 func (req *CreateReviewRequest) Validate() error {
-	if req.Score > 5 {
+	if req.Score < 1 || req.Score > 5 {
 		return contracts.ErrBadRequest
 	}
 	return nil

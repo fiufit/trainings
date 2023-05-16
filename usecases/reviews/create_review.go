@@ -44,5 +44,7 @@ func (uc *ReviewCreatorImpl) CreateReview(ctx context.Context, req reviews.Creat
 		Comment:        req.Comment,
 	}
 	createdReview, err := uc.reviews.CreateReview(ctx, newReview)
+	usr, _ := uc.users.GetUserByID(ctx, createdReview.UserID)
+	createdReview.User = usr
 	return createdReview, err
 }

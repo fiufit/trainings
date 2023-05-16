@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/fiufit/trainings/contracts/trainings"
-	"github.com/fiufit/trainings/contracts/users"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories/mocks"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +35,7 @@ func TestCreateTrainingOk(t *testing.T) {
 
 	training := trainings.ConverToTrainingPlan(req)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(training, nil)
-	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(users.GetUserResponse{}, nil)
+	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{}, nil)
 
 	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, zaptest.NewLogger(t))
 	res, err := trainingUc.CreateTraining(ctx, req)
@@ -59,7 +58,7 @@ func TestCreateTrainingError(t *testing.T) {
 
 	training := trainings.ConverToTrainingPlan(req)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(models.TrainingPlan{}, errors.New("repo error"))
-	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(users.GetUserResponse{}, nil)
+	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{}, nil)
 
 	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, zaptest.NewLogger(t))
 	res, err := trainingUc.CreateTraining(ctx, req)

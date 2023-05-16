@@ -31,6 +31,7 @@ func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req training
 	}
 	for i := range res.TrainingPlans {
 		uc.fillTrainingPicture(ctx, &res.TrainingPlans[i])
+		uc.calculateMeanScore(ctx, &res.TrainingPlans[i])
 	}
 	return res, nil
 }
@@ -41,10 +42,25 @@ func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, trainingID ui
 		return training, err
 	}
 	uc.fillTrainingPicture(ctx, &training)
+	uc.calculateMeanScore(ctx, &training)
 	return training, nil
 }
 
 func (uc *TrainingGetterImpl) fillTrainingPicture(ctx context.Context, training *models.TrainingPlan) {
 	trainingPictureUrl := uc.firebase.GetTrainingPictureUrl(ctx, training.ID, training.TrainerID)
 	(*training).PictureUrl = trainingPictureUrl
+}
+
+func (uc *TrainingGetterImpl) calculateMeanScore(ctx context.Context, training *models.TrainingPlan) {
+	sum := uint(0)
+	for i := range training.Reviews {
+		sum += training.Reviews[i].Score
+	}
+	reviews := uint(len(training.Reviews))
+	if reviews != 0 {
+		(*training).MeanScore = float32(sum / reviews)
+	} else {
+		(*training).MeanScore = 0
+	}
+
 }

@@ -17,11 +17,12 @@ type ReviewGetter interface {
 type ReviewGetterImpl struct {
 	trainings repositories.TrainingPlans
 	reviews   repositories.Reviews
+	users     repositories.Users
 	logger    *zap.Logger
 }
 
-func NewReviewGetterImpl(trainings repositories.TrainingPlans, reviews repositories.Reviews, logger *zap.Logger) ReviewGetterImpl {
-	return ReviewGetterImpl{trainings: trainings, reviews: reviews, logger: logger}
+func NewReviewGetterImpl(trainings repositories.TrainingPlans, reviews repositories.Reviews, users repositories.Users, logger *zap.Logger) ReviewGetterImpl {
+	return ReviewGetterImpl{trainings: trainings, reviews: reviews, users: users, logger: logger}
 }
 
 func (uc *ReviewGetterImpl) GetReviews(ctx context.Context, req reviews.GetReviewsRequest) (reviews.GetReviewsResponse, error) {
@@ -29,7 +30,15 @@ func (uc *ReviewGetterImpl) GetReviews(ctx context.Context, req reviews.GetRevie
 	if err != nil {
 		return reviews.GetReviewsResponse{}, err
 	}
-	return uc.reviews.GetReviews(ctx, req)
+	res, err := uc.reviews.GetReviews(ctx, req)
+	if err != nil {
+		return reviews.GetReviewsResponse{}, err
+	}
+	for i := range res.Reviews {
+		usr, _ := uc.users.GetUserByID(ctx, res.Reviews[i].UserID)
+		res.Reviews[i].User = usr
+	}
+	return res, nil
 }
 
 func (uc *ReviewGetterImpl) GetReviewByID(ctx context.Context, trainingPlanID uint, reviewID uint) (models.Review, error) {
@@ -37,5 +46,11 @@ func (uc *ReviewGetterImpl) GetReviewByID(ctx context.Context, trainingPlanID ui
 	if err != nil {
 		return models.Review{}, err
 	}
-	return uc.reviews.GetReviewByID(ctx, reviewID)
+	review, err := uc.reviews.GetReviewByID(ctx, reviewID)
+	if err != nil {
+		return models.Review{}, err
+	}
+	usr, _ := uc.users.GetUserByID(ctx, review.UserID)
+	review.User = usr
+	return review, nil
 }

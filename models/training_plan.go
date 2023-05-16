@@ -16,6 +16,7 @@ type TrainingPlan struct {
 	CreatedAt   time.Time `gorm:"not null"`
 	DeletedAt   gorm.DeletedAt
 	Exercises   []Exercise `gorm:"foreignKey:TrainingPlanID"`
-	Reviews     []Review   `gorm:"foreignKey:TrainingPlanID"`
+	Reviews     []Review   `gorm:"foreignKey:TrainingPlanID" json:"-"`
+	MeanScore   float32    `gorm:"-"`
 	PictureUrl  string     `gorm:"-"`
 }

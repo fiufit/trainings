@@ -85,8 +85,8 @@ func NewServer() *Server {
 	getExerciseUc := exercises.NewExerciseGetterImpl(trainingRepo, exerciseRepo, logger)
 
 	createReviewUc := reviews.NewReviewCreatorImpl(trainingRepo, reviewRepo, userRepo, logger)
-	getReviewUc := reviews.NewReviewGetterImpl(trainingRepo, reviewRepo, logger)
-	updateReviewUc := reviews.NewReviewUpdaterImpl(trainingRepo, reviewRepo, logger)
+	getReviewUc := reviews.NewReviewGetterImpl(trainingRepo, reviewRepo, userRepo, logger)
+	updateReviewUc := reviews.NewReviewUpdaterImpl(trainingRepo, reviewRepo, userRepo, logger)
 	deleteReviewUc := reviews.NewReviewDeleterImpl(trainingRepo, reviewRepo, logger)
 
 	// HANDLERS

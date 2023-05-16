@@ -17,11 +17,12 @@ type ReviewUpdater interface {
 type ReviewUpdaterImpl struct {
 	trainings repositories.TrainingPlans
 	reviews   repositories.Reviews
+	users     repositories.Users
 	logger    *zap.Logger
 }
 
-func NewReviewUpdaterImpl(trainings repositories.TrainingPlans, reviews repositories.Reviews, logger *zap.Logger) ReviewUpdaterImpl {
-	return ReviewUpdaterImpl{trainings: trainings, reviews: reviews, logger: logger}
+func NewReviewUpdaterImpl(trainings repositories.TrainingPlans, reviews repositories.Reviews, users repositories.Users, logger *zap.Logger) ReviewUpdaterImpl {
+	return ReviewUpdaterImpl{trainings: trainings, reviews: reviews, users: users, logger: logger}
 }
 
 func (uc *ReviewUpdaterImpl) UpdateReview(ctx context.Context, req reviews.UpdateReviewRequest) (models.Review, error) {
@@ -39,19 +40,20 @@ func (uc *ReviewUpdaterImpl) UpdateReview(ctx context.Context, req reviews.Updat
 		return models.Review{}, contracts.ErrUnauthorizedReviewer
 	}
 
-	patchedReview, err := uc.patchReviewModel(ctx, review, req)
-	if err != nil {
-		return models.Review{}, err
-	}
+	patchedReview := uc.patchReviewModel(ctx, review, req)
 
 	updatedReview, err := uc.reviews.UpdateReview(ctx, patchedReview)
 	if err != nil {
 		return models.Review{}, err
 	}
+
+	usr, _ := uc.users.GetUserByID(ctx, updatedReview.UserID)
+	updatedReview.User = usr
+
 	return updatedReview, nil
 }
 
-func (uc *ReviewUpdaterImpl) patchReviewModel(ctx context.Context, review models.Review, req reviews.UpdateReviewRequest) (models.Review, error) {
+func (uc *ReviewUpdaterImpl) patchReviewModel(ctx context.Context, review models.Review, req reviews.UpdateReviewRequest) models.Review {
 	if req.Score != 0 {
 		review.Score = req.Score
 	}
@@ -60,5 +62,5 @@ func (uc *ReviewUpdaterImpl) patchReviewModel(ctx context.Context, review models
 		review.Comment = req.Comment
 	}
 
-	return review, nil
+	return review
 }

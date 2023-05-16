@@ -48,7 +48,7 @@ func (repo TrainingRepository) CreateTrainingPlan(ctx context.Context, training 
 func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error) {
 	db := repo.db.WithContext(ctx)
 	var training models.TrainingPlan
-	result := db.Preload("Exercises").First(&training, "id = ?", trainingID)
+	result := db.Preload("Exercises").Preload("Reviews").First(&training, "id = ?", trainingID)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return models.TrainingPlan{}, contracts.ErrTrainingPlanNotFound
@@ -86,7 +86,7 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 		db = db.Where("duration >= ? AND (duration <= ? OR ? = 0)", req.MinDuration, req.MaxDuration, req.MaxDuration)
 	}
 
-	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Find(&res)
+	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Find(&res)
 	if result.Error != nil {
 		repo.logger.Error("Unable to get training plans with pagination", zap.Error(result.Error), zap.Any("request", req))
 		return trainings.GetTrainingsResponse{}, result.Error

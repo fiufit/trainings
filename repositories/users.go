@@ -6,14 +6,14 @@ import (
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/users"
+	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/utils"
 	"go.uber.org/zap"
 )
 
 //go:generate mockery --name Users
 type Users interface {
-	GetUserByID(ctx context.Context, userID string) (users.GetUserResponse, error)
+	GetUserByID(ctx context.Context, userID string) (models.User, error)
 }
 
 type UserRepository struct {
@@ -26,29 +26,29 @@ func NewUserRepository(url string, logger *zap.Logger, version string) UserRepos
 	return UserRepository{url: url, logger: logger, version: version}
 }
 
-func (repo UserRepository) GetUserByID(ctx context.Context, userID string) (users.GetUserResponse, error) {
+func (repo UserRepository) GetUserByID(ctx context.Context, userID string) (models.User, error) {
 	url := repo.url + "/" + repo.version + "/users/" + userID
 	res, err := utils.MakeRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return users.GetUserResponse{}, err
+		return models.User{}, err
 	}
 	defer res.Body.Close()
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return users.GetUserResponse{}, err
+		return models.User{}, err
 	}
 	statusCode := res.StatusCode
 
 	if statusCode >= 400 {
 		err := contracts.UnwrapError(resBody)
-		return users.GetUserResponse{}, err
+		return models.User{}, err
 	}
 
-	var userResponse users.GetUserResponse
+	var userResponse models.User
 	user, err := contracts.UnwrapOkResponse(resBody, &userResponse)
 	if err != nil {
-		return users.GetUserResponse{}, err
+		return models.User{}, err
 	}
-	userResponse = *user.(*users.GetUserResponse)
+	userResponse = *user.(*models.User)
 	return userResponse, nil
 }

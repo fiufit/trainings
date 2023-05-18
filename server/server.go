@@ -6,10 +6,13 @@ import (
 	"os"
 
 	"github.com/fiufit/trainings/database"
-	"github.com/fiufit/trainings/handlers"
+	exerciseHandlers "github.com/fiufit/trainings/handlers/exercises"
+	reviewHandlers "github.com/fiufit/trainings/handlers/reviews"
+	trainingHandlers "github.com/fiufit/trainings/handlers/trainings"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"github.com/fiufit/trainings/usecases/exercises"
+	"github.com/fiufit/trainings/usecases/reviews"
 	"github.com/fiufit/trainings/usecases/trainings"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -17,14 +20,19 @@ import (
 
 type Server struct {
 	router         *gin.Engine
-	createTraining handlers.CreateTraining
-	getTrainings   handlers.GetTrainings
-	updateTraining handlers.UpdateTraining
-	createExercise handlers.CreateExercise
-	deleteExercise handlers.DeleteExercise
-	updateExercise handlers.UpdateExercise
-	getExercise    handlers.GetExercise
-	deleteTraining handlers.DeleteTraining
+	createTraining trainingHandlers.CreateTraining
+	getTrainings   trainingHandlers.GetTrainings
+	updateTraining trainingHandlers.UpdateTraining
+	deleteTraining trainingHandlers.DeleteTraining
+	createExercise exerciseHandlers.CreateExercise
+	deleteExercise exerciseHandlers.DeleteExercise
+	updateExercise exerciseHandlers.UpdateExercise
+	getExercise    exerciseHandlers.GetExercise
+	createReview   reviewHandlers.CreateReview
+	updateReview   reviewHandlers.UpdateReview
+	getReviews     reviewHandlers.GetReviews
+	getReviewByID  reviewHandlers.GetReviewByID
+	deleteReview   reviewHandlers.DeleteReview
 }
 
 func (s *Server) Run() {
@@ -40,7 +48,7 @@ func NewServer() *Server {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{})
+	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{}, &models.Review{})
 	if err != nil {
 		panic(err)
 	}
@@ -59,6 +67,7 @@ func NewServer() *Server {
 	trainingRepo := repositories.NewTrainingRepository(db, logger)
 	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
 	exerciseRepo := repositories.NewExerciseRepository(db, logger)
+	reviewRepo := repositories.NewReviewRepository(db, logger)
 	firebaseRepo, err := repositories.NewFirebaseRepository(logger, sdkJson, bucketName)
 	if err != nil {
 		panic(err)
@@ -75,16 +84,27 @@ func NewServer() *Server {
 	updateExerciseUc := exercises.NewExerciseUpdaterImpl(trainingRepo, exerciseRepo, logger)
 	getExerciseUc := exercises.NewExerciseGetterImpl(trainingRepo, exerciseRepo, logger)
 
-	// HANDLERS
-	createTraining := handlers.NewCreateTraining(&createTrainingUc, logger)
-	getTrainings := handlers.NewGetTrainings(&getTrainingUc, logger)
-	updateTraining := handlers.NewUpdateTraining(&updateTrainingUc, logger)
-	deleteTraining := handlers.NewDeleteTraining(&deleteTrainingUc, logger)
+	createReviewUc := reviews.NewReviewCreatorImpl(trainingRepo, reviewRepo, userRepo, logger)
+	getReviewUc := reviews.NewReviewGetterImpl(trainingRepo, reviewRepo, userRepo, logger)
+	updateReviewUc := reviews.NewReviewUpdaterImpl(trainingRepo, reviewRepo, userRepo, logger)
+	deleteReviewUc := reviews.NewReviewDeleterImpl(trainingRepo, reviewRepo, logger)
 
-	createExercise := handlers.NewCreateExercise(&createExerciseUc, logger)
-	deleteExercise := handlers.NewDeleteExercise(&deleteExerciseUc, logger)
-	updateExercise := handlers.NewUpdateExercise(&updateExerciseUc, logger)
-	getExercise := handlers.NewGetExercises(&getExerciseUc, logger)
+	// HANDLERS
+	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)
+	getTrainings := trainingHandlers.NewGetTrainings(&getTrainingUc, logger)
+	updateTraining := trainingHandlers.NewUpdateTraining(&updateTrainingUc, logger)
+	deleteTraining := trainingHandlers.NewDeleteTraining(&deleteTrainingUc, logger)
+
+	createExercise := exerciseHandlers.NewCreateExercise(&createExerciseUc, logger)
+	deleteExercise := exerciseHandlers.NewDeleteExercise(&deleteExerciseUc, logger)
+	updateExercise := exerciseHandlers.NewUpdateExercise(&updateExerciseUc, logger)
+	getExercise := exerciseHandlers.NewGetExercises(&getExerciseUc, logger)
+
+	createReview := reviewHandlers.NewCreateReview(&createReviewUc, logger)
+	getReviews := reviewHandlers.NewGetReviews(&getReviewUc, logger)
+	getReviewByID := reviewHandlers.NewGetReviewByID(&getReviewUc, logger)
+	updateReview := reviewHandlers.NewUpdateReview(&updateReviewUc, logger)
+	deleteReview := reviewHandlers.NewDeleteReview(&deleteReviewUc, logger)
 
 	return &Server{
 		router:         gin.Default(),
@@ -96,5 +116,10 @@ func NewServer() *Server {
 		updateExercise: updateExercise,
 		getExercise:    getExercise,
 		deleteTraining: deleteTraining,
+		createReview:   createReview,
+		getReviews:     getReviews,
+		getReviewByID:  getReviewByID,
+		updateReview:   updateReview,
+		deleteReview:   deleteReview,
 	}
 }

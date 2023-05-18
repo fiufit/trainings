@@ -1,4 +1,4 @@
-package training
+package exercises
 
 type CreateExerciseRequest struct {
 	Title          string `json:"title" binding:"required"`

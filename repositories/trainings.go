@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/database"
 	"github.com/fiufit/trainings/models"
 	"go.uber.org/zap"
@@ -18,7 +18,7 @@ import (
 type TrainingPlans interface {
 	CreateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
 	GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error)
-	GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error)
+	GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
 	UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
 	DeleteTrainingPlan(ctx context.Context, trainingID uint) error
 }
@@ -48,7 +48,7 @@ func (repo TrainingRepository) CreateTrainingPlan(ctx context.Context, training 
 func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error) {
 	db := repo.db.WithContext(ctx)
 	var training models.TrainingPlan
-	result := db.Preload("Exercises").First(&training, "id = ?", trainingID)
+	result := db.Preload("Exercises").Preload("Reviews").First(&training, "id = ?", trainingID)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return models.TrainingPlan{}, contracts.ErrTrainingPlanNotFound
@@ -60,7 +60,7 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 	return training, nil
 }
 
-func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error) {
+func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error) {
 	var res []models.TrainingPlan
 	db := repo.db.WithContext(ctx)
 
@@ -86,13 +86,13 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 		db = db.Where("duration >= ? AND (duration <= ? OR ? = 0)", req.MinDuration, req.MaxDuration, req.MaxDuration)
 	}
 
-	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Find(&res)
+	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Find(&res)
 	if result.Error != nil {
 		repo.logger.Error("Unable to get training plans with pagination", zap.Error(result.Error), zap.Any("request", req))
-		return training.GetTrainingsResponse{}, result.Error
+		return trainings.GetTrainingsResponse{}, result.Error
 	}
 
-	return training.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
+	return trainings.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
 }
 
 func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error) {
@@ -107,7 +107,7 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 
 func (repo TrainingRepository) DeleteTrainingPlan(ctx context.Context, trainingID uint) error {
 	db := repo.db.WithContext(ctx)
-	result := db.Select("Exercises").Delete(&models.TrainingPlan{ID: trainingID})
+	result := db.Select("Exercises", "Reviews").Delete(&models.TrainingPlan{ID: trainingID})
 	if result.Error != nil {
 		repo.logger.Error("Unable to delete training plan", zap.Error(result.Error))
 		return result.Error

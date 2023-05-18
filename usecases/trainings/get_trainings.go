@@ -3,14 +3,14 @@ package trainings
 import (
 	"context"
 
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"go.uber.org/zap"
 )
 
 type TrainingGetter interface {
-	GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error)
+	GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
 	GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error)
 }
 
@@ -24,13 +24,14 @@ func NewTrainingGetterImpl(trainings repositories.TrainingPlans, firebase reposi
 	return TrainingGetterImpl{trainings: trainings, firebase: firebase, logger: logger}
 }
 
-func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req training.GetTrainingsRequest) (training.GetTrainingsResponse, error) {
+func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error) {
 	res, err := uc.trainings.GetTrainingPlans(ctx, req)
 	if err != nil {
 		return res, err
 	}
 	for i := range res.TrainingPlans {
 		uc.fillTrainingPicture(ctx, &res.TrainingPlans[i])
+		uc.calculateMeanScore(ctx, &res.TrainingPlans[i])
 	}
 	return res, nil
 }
@@ -41,10 +42,25 @@ func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, trainingID ui
 		return training, err
 	}
 	uc.fillTrainingPicture(ctx, &training)
+	uc.calculateMeanScore(ctx, &training)
 	return training, nil
 }
 
 func (uc *TrainingGetterImpl) fillTrainingPicture(ctx context.Context, training *models.TrainingPlan) {
 	trainingPictureUrl := uc.firebase.GetTrainingPictureUrl(ctx, training.ID, training.TrainerID)
 	(*training).PictureUrl = trainingPictureUrl
+}
+
+func (uc *TrainingGetterImpl) calculateMeanScore(ctx context.Context, training *models.TrainingPlan) {
+	sum := uint(0)
+	for i := range training.Reviews {
+		sum += training.Reviews[i].Score
+	}
+	reviews := uint(len(training.Reviews))
+	if reviews != 0 {
+		(*training).MeanScore = float32(sum / reviews)
+	} else {
+		(*training).MeanScore = 0
+	}
+
 }

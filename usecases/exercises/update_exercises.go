@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
+	"github.com/fiufit/trainings/contracts/exercises"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"go.uber.org/zap"
 )
 
 type ExerciseUpdater interface {
-	UpdateExercise(ctx context.Context, req training.UpdateExerciseRequest) (models.Exercise, error)
+	UpdateExercise(ctx context.Context, req exercises.UpdateExerciseRequest) (models.Exercise, error)
 }
 
 type ExerciseUpdaterImpl struct {
@@ -24,7 +24,7 @@ func NewExerciseUpdaterImpl(trainings repositories.TrainingPlans, exercises repo
 	return ExerciseUpdaterImpl{trainings: trainings, exercises: exercises, logger: logger}
 }
 
-func (uc *ExerciseUpdaterImpl) UpdateExercise(ctx context.Context, req training.UpdateExerciseRequest) (models.Exercise, error) {
+func (uc *ExerciseUpdaterImpl) UpdateExercise(ctx context.Context, req exercises.UpdateExerciseRequest) (models.Exercise, error) {
 	training, err := uc.trainings.GetTrainingByID(ctx, req.TrainingPlanID)
 	if err != nil {
 		return models.Exercise{}, err
@@ -50,7 +50,7 @@ func (uc *ExerciseUpdaterImpl) UpdateExercise(ctx context.Context, req training.
 	return updatedExercise, nil
 }
 
-func (uc *ExerciseUpdaterImpl) patchExerciseModel(ctx context.Context, exercise models.Exercise, req training.UpdateExerciseRequest) (models.Exercise, error) {
+func (uc *ExerciseUpdaterImpl) patchExerciseModel(ctx context.Context, exercise models.Exercise, req exercises.UpdateExerciseRequest) (models.Exercise, error) {
 	if req.Title != "" {
 		exercise.Title = req.Title
 	}

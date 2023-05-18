@@ -12,4 +12,8 @@ var (
 	ErrTrainingPlanNotFound = errors.New("training plan not found")
 	ErrExerciseNotFound     = errors.New("exercise not found")
 	ErrUnauthorizedTrainer  = errors.New("user is not the training creator")
+	ErrSelfReview           = errors.New("user is not allowed to review their own training")
+	ErrReviewAlreadyExists  = errors.New("user already reviewed the training")
+	ErrReviewNotFound       = errors.New("review not found")
+	ErrUnauthorizedReviewer = errors.New("user is not the review creator")
 )

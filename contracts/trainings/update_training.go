@@ -1,4 +1,4 @@
-package training
+package trainings
 
 import "github.com/fiufit/trainings/models"
 

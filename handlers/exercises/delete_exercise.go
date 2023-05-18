@@ -5,24 +5,24 @@ import (
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/usecases/trainings"
+	"github.com/fiufit/trainings/contracts/exercises"
+	uexercises "github.com/fiufit/trainings/usecases/exercises"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type DeleteTraining struct {
-	trainings trainings.TrainingDeleter
+type DeleteExercise struct {
+	exercises uexercises.ExerciseDeleter
 	logger    *zap.Logger
 }
 
-func NewDeleteTraining(trainings trainings.TrainingDeleter, logger *zap.Logger) DeleteTraining {
-	return DeleteTraining{trainings: trainings, logger: logger}
+func NewDeleteExercise(exercises uexercises.ExerciseDeleter, logger *zap.Logger) DeleteExercise {
+	return DeleteExercise{exercises: exercises, logger: logger}
 }
 
-func (h DeleteTraining) Handle() gin.HandlerFunc {
+func (h DeleteExercise) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req training.DeleteTrainingRequest
+		var req exercises.DeleteExerciseRequest
 		err := ctx.ShouldBindJSON(&req)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
@@ -30,10 +30,16 @@ func (h DeleteTraining) Handle() gin.HandlerFunc {
 		}
 
 		trainingID := ctx.MustGet("trainingID").(uint)
+		exerciseID := ctx.MustGet("exerciseID").(uint)
 		req.TrainingPlanID = trainingID
+		req.ExerciseID = exerciseID
 
-		err = h.trainings.DeleteTraining(ctx, req)
+		err = h.exercises.DeleteExercise(ctx, req)
 		if err != nil {
+			if errors.Is(err, contracts.ErrExerciseNotFound) {
+				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
+				return
+			}
 			if errors.Is(err, contracts.ErrUnauthorizedTrainer) {
 				ctx.JSON(http.StatusUnauthorized, contracts.FormatErrResponse(err))
 				return

@@ -5,24 +5,24 @@ import (
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/usecases/exercises"
+	"github.com/fiufit/trainings/contracts/exercises"
+	uexercises "github.com/fiufit/trainings/usecases/exercises"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type GetExercise struct {
-	exercises exercises.ExerciseGetter
+	exercises uexercises.ExerciseGetter
 	logger    *zap.Logger
 }
 
-func NewGetExercises(exercises exercises.ExerciseGetter, logger *zap.Logger) GetExercise {
+func NewGetExercises(exercises uexercises.ExerciseGetter, logger *zap.Logger) GetExercise {
 	return GetExercise{exercises: exercises, logger: logger}
 }
 
 func (h GetExercise) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req training.GetExerciseRequest
+		var req exercises.GetExerciseRequest
 
 		trainingID := ctx.MustGet("trainingID").(uint)
 		exerciseID := ctx.MustGet("exerciseID").(uint)

@@ -5,24 +5,24 @@ import (
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
-	"github.com/fiufit/trainings/contracts/training"
-	"github.com/fiufit/trainings/usecases/exercises"
+	"github.com/fiufit/trainings/contracts/trainings"
+	utrainings "github.com/fiufit/trainings/usecases/trainings"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type UpdateExercise struct {
-	exercises exercises.ExerciseUpdater
+type UpdateTraining struct {
+	trainings utrainings.TrainingUpdater
 	logger    *zap.Logger
 }
 
-func NewUpdateExercise(exercises exercises.ExerciseUpdater, logger *zap.Logger) UpdateExercise {
-	return UpdateExercise{exercises: exercises, logger: logger}
+func NewUpdateTraining(trainings utrainings.TrainingUpdater, logger *zap.Logger) UpdateTraining {
+	return UpdateTraining{trainings: trainings, logger: logger}
 }
 
-func (h UpdateExercise) Handle() gin.HandlerFunc {
+func (h UpdateTraining) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req training.UpdateExerciseRequest
+		var req trainings.UpdateTrainingRequest
 		err := ctx.ShouldBindJSON(&req)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
@@ -30,18 +30,12 @@ func (h UpdateExercise) Handle() gin.HandlerFunc {
 		}
 
 		trainingID := ctx.MustGet("trainingID").(uint)
-		exerciseID := ctx.MustGet("exerciseID").(uint)
-		req.TrainingPlanID = trainingID
-		req.ExerciseID = exerciseID
+		req.ID = trainingID
 
-		updatedExercise, err := h.exercises.UpdateExercise(ctx, req)
+		updatedTraining, err := h.trainings.UpdateTrainingPlan(ctx, req)
 		if err != nil {
 			if errors.Is(err, contracts.ErrTrainingPlanNotFound) {
 				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(contracts.ErrTrainingPlanNotFound))
-				return
-			}
-			if errors.Is(err, contracts.ErrExerciseNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(contracts.ErrExerciseNotFound))
 				return
 			}
 			if errors.Is(err, contracts.ErrUnauthorizedTrainer) {
@@ -51,6 +45,6 @@ func (h UpdateExercise) Handle() gin.HandlerFunc {
 			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
 			return
 		}
-		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(updatedExercise))
+		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(updatedTraining))
 	}
 }

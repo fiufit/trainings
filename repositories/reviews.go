@@ -41,7 +41,7 @@ func (repo ReviewRepository) CreateReview(ctx context.Context, review models.Rev
 		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
 			return models.Review{}, contracts.ErrReviewAlreadyExists
 		}
-		repo.logger.Error("Unable to create training plan", zap.Error(result.Error), zap.Any("review", review))
+		repo.logger.Error("Unable to create review", zap.Error(result.Error), zap.Any("review", review))
 		return models.Review{}, result.Error
 	}
 	return review, nil

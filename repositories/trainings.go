@@ -107,7 +107,7 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 
 func (repo TrainingRepository) DeleteTrainingPlan(ctx context.Context, trainingID uint) error {
 	db := repo.db.WithContext(ctx)
-	result := db.Select("Exercises").Delete(&models.TrainingPlan{ID: trainingID})
+	result := db.Select("Exercises", "Reviews").Delete(&models.TrainingPlan{ID: trainingID})
 	if result.Error != nil {
 		repo.logger.Error("Unable to delete training plan", zap.Error(result.Error))
 		return result.Error

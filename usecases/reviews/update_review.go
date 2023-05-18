@@ -47,7 +47,10 @@ func (uc *ReviewUpdaterImpl) UpdateReview(ctx context.Context, req reviews.Updat
 		return models.Review{}, err
 	}
 
-	usr, _ := uc.users.GetUserByID(ctx, updatedReview.UserID)
+	usr, err := uc.users.GetUserByID(ctx, updatedReview.UserID)
+	if err != nil {
+		return models.Review{}, err
+	}
 	updatedReview.User = usr
 
 	return updatedReview, nil

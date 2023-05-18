@@ -26,7 +26,7 @@ func NewReviewCreatorImpl(trainings repositories.TrainingPlans, reviews reposito
 }
 
 func (uc *ReviewCreatorImpl) CreateReview(ctx context.Context, req reviews.CreateReviewRequest) (models.Review, error) {
-	_, err := uc.users.GetUserByID(ctx, req.UserID)
+	usr, err := uc.users.GetUserByID(ctx, req.UserID)
 	if err != nil {
 		return models.Review{}, err
 	}
@@ -40,11 +40,10 @@ func (uc *ReviewCreatorImpl) CreateReview(ctx context.Context, req reviews.Creat
 	newReview := models.Review{
 		TrainingPlanID: req.TrainingPlanID,
 		UserID:         req.UserID,
+		User:           usr,
 		Score:          req.Score,
 		Comment:        req.Comment,
 	}
 	createdReview, err := uc.reviews.CreateReview(ctx, newReview)
-	usr, _ := uc.users.GetUserByID(ctx, createdReview.UserID)
-	createdReview.User = usr
 	return createdReview, err
 }

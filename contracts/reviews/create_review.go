@@ -5,7 +5,7 @@ import (
 )
 
 type CreateReviewRequest struct {
-	Score          uint   `json:"score" binding:"required" validate:"scoreRange"`
+	Score          uint   `json:"score" binding:"required"`
 	Comment        string `json:"comment"`
 	UserID         string `json:"user_id" binding:"required"`
 	TrainingPlanID uint

@@ -52,13 +52,13 @@ func (uc *TrainingGetterImpl) fillTrainingPicture(ctx context.Context, training 
 }
 
 func (uc *TrainingGetterImpl) calculateMeanScore(ctx context.Context, training *models.TrainingPlan) {
-	sum := uint(0)
+	var sum float32
 	for i := range training.Reviews {
-		sum += training.Reviews[i].Score
+		sum += float32(training.Reviews[i].Score)
 	}
-	reviews := uint(len(training.Reviews))
-	if reviews != 0 {
-		(*training).MeanScore = float32(sum / reviews)
+	reviewCount := float32(len(training.Reviews))
+	if reviewCount != 0 {
+		(*training).MeanScore = sum / reviewCount
 	} else {
 		(*training).MeanScore = 0
 	}

@@ -13,6 +13,17 @@ type CreateTrainingRequest struct {
 	TrainerID   string            `json:"trainer_id" binding:"required"`
 	Duration    uint              `json:"duration" binding:"required"`
 	Exercises   []ExerciseRequest `json:"exercises" binding:"required"`
+	Tags        []models.Tag      `json:"-"`
+	TagStrings  []string          `json:"tags"`
+}
+
+func (req *CreateTrainingRequest) Validate() error {
+	tags, err := models.ValidateTags(req.TagStrings...)
+	if err != nil {
+		return err
+	}
+	req.Tags = tags
+	return nil
 }
 
 type CreateTrainingResponse struct {
@@ -51,5 +62,6 @@ func ConverToTrainingPlan(trainingReq CreateTrainingRequest) models.TrainingPlan
 		Duration:    trainingReq.Duration,
 		CreatedAt:   time.Now(),
 		Exercises:   exercises,
+		Tags:        trainingReq.Tags,
 	}
 }

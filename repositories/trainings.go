@@ -48,7 +48,7 @@ func (repo TrainingRepository) CreateTrainingPlan(ctx context.Context, training 
 func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error) {
 	db := repo.db.WithContext(ctx)
 	var training models.TrainingPlan
-	result := db.Preload("Exercises").Preload("Reviews").First(&training, "id = ?", trainingID)
+	result := db.Preload("Exercises").Preload("Reviews").Preload("Tags").First(&training, "id = ?", trainingID)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return models.TrainingPlan{}, contracts.ErrTrainingPlanNotFound
@@ -86,7 +86,7 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 		db = db.Where("duration >= ? AND (duration <= ? OR ? = 0)", req.MinDuration, req.MaxDuration, req.MaxDuration)
 	}
 
-	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Find(&res)
+	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Preload("Tags").Find(&res)
 	if result.Error != nil {
 		repo.logger.Error("Unable to get training plans with pagination", zap.Error(result.Error), zap.Any("request", req))
 		return trainings.GetTrainingsResponse{}, result.Error
@@ -97,6 +97,13 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 
 func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error) {
 	db := repo.db.WithContext(ctx)
+
+	err := db.Model(&training).Association("Tags").Replace(training.Tags)
+	if err != nil {
+		repo.logger.Error("Unable to update training tags", zap.Error(err), zap.Any("training", training))
+		return models.TrainingPlan{}, err
+	}
+
 	result := db.Save(&training)
 	if result.Error != nil {
 		repo.logger.Error("Unable to update training plan", zap.Error(result.Error), zap.Any("training", training))

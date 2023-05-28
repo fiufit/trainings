@@ -48,7 +48,7 @@ func NewServer() *Server {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{}, &models.Review{})
+	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{}, &models.Review{}, &models.Tag{})
 	if err != nil {
 		panic(err)
 	}

@@ -85,8 +85,17 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 	if req.MinDuration != 0 || req.MaxDuration != 0 {
 		db = db.Where("duration >= ? AND (duration <= ? OR ? = 0)", req.MinDuration, req.MaxDuration, req.MaxDuration)
 	}
+	var result *gorm.DB
+	if len(req.Tags) == 0 {
+		result = db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Preload("Tags").Find(&res)
+	} else {
+		// TODO: find out why the following query is ignoring the 'tags.name IN()' condition inside Preload(). We are settling for an uglier query instead...
+		//result = db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Preload("Tags", "name IN (?)", req.TagStrings).Find(&res)
 
-	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Preload("Tags").Find(&res)
+		db = db.Joins("JOIN training_plan_tags ON training_plan_tags.training_plan_id = training_plans.id").Where("training_plan_tags.tag_name IN (?)", req.TagStrings)
+		result = db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Preload("Tags").Find(&res)
+	}
+
 	if result.Error != nil {
 		repo.logger.Error("Unable to get training plans with pagination", zap.Error(result.Error), zap.Any("request", req))
 		return trainings.GetTrainingsResponse{}, result.Error

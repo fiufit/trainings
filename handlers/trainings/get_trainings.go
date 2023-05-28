@@ -23,7 +23,8 @@ func (h GetTrainings) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req trainings.GetTrainingsRequest
 		err := ctx.ShouldBindQuery(&req)
-		if err != nil {
+		validateErr := req.Validate()
+		if err != nil || validateErr != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
 			return
 		}

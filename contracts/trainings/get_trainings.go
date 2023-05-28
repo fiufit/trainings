@@ -12,6 +12,7 @@ type GetTrainingsRequest struct {
 	TrainerID   string   `form:"trainer_id"`
 	MinDuration uint     `form:"min_duration"`
 	MaxDuration uint     `form:"max_duration"`
+	UserID      string   `form:"user_id"`
 	TagStrings  []string `form:"tags[]"`
 	Tags        []models.Tag
 	contracts.Pagination

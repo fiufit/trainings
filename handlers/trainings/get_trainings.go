@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
@@ -29,8 +30,19 @@ func (h GetTrainings) Handle() gin.HandlerFunc {
 			return
 		}
 		req.Pagination.Validate()
-		resTrainings, err := h.trainings.GetTrainingPlans(ctx, req)
+		var resTrainings trainings.GetTrainingsResponse
+		if req.UserID != "" {
+			resTrainings, err = h.trainings.GetRecommendedPlans(ctx, req)
+		} else {
+			resTrainings, err = h.trainings.GetTrainingPlans(ctx, req)
+		}
+
 		if err != nil {
+			if errors.Is(err, contracts.ErrUserNotFound) {
+				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
+				return
+			}
+
 			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
 			return
 		}

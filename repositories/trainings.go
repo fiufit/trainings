@@ -62,11 +62,6 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 		return models.TrainingPlan{}, result.Error
 	}
 
-	type Result struct {
-		models.TrainingPlan
-		MeanScore float32
-	}
-
 	var resultStruct Result
 	result.Scan(&resultStruct)
 
@@ -114,11 +109,6 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 		return trainings.GetTrainingsResponse{}, result.Error
 	}
 
-	type Result struct {
-		models.TrainingPlan
-		MeanScore float32
-	}
-
 	var results []Result
 	result.Scan(&results)
 
@@ -150,4 +140,9 @@ func (repo TrainingRepository) DeleteTrainingPlan(ctx context.Context, trainingI
 		return contracts.ErrTrainingPlanNotFound
 	}
 	return nil
+}
+
+type Result struct {
+	models.TrainingPlan
+	MeanScore float32
 }

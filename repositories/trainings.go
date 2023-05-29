@@ -48,7 +48,12 @@ func (repo TrainingRepository) CreateTrainingPlan(ctx context.Context, training 
 func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error) {
 	db := repo.db.WithContext(ctx)
 	var training models.TrainingPlan
-	result := db.Preload("Exercises").Preload("Reviews").First(&training, "id = ?", trainingID)
+	result := db.
+		Preload("Exercises").
+		Preload("Reviews").
+		Select("training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score").
+		First(&training, "id = ?", trainingID)
+
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return models.TrainingPlan{}, contracts.ErrTrainingPlanNotFound
@@ -56,6 +61,16 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 		repo.logger.Error("Unable to get training plan", zap.Error(result.Error), zap.Uint("ID", trainingID))
 		return models.TrainingPlan{}, result.Error
 	}
+
+	type Result struct {
+		models.TrainingPlan
+		MeanScore float32
+	}
+
+	var resultStruct Result
+	result.Scan(&resultStruct)
+
+	training.MeanScore = resultStruct.MeanScore
 
 	return training, nil
 }
@@ -86,10 +101,29 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 		db = db.Where("duration >= ? AND (duration <= ? OR ? = 0)", req.MinDuration, req.MaxDuration, req.MaxDuration)
 	}
 
-	result := db.Scopes(database.Paginate(res, &req.Pagination, db)).Preload("Exercises").Preload("Reviews").Find(&res)
+	result := db.
+		Scopes(database.Paginate(res, &req.Pagination, db)).
+		Preload("Exercises").
+		Preload("Reviews").
+		Select("training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score").
+		Order("mean_score DESC").
+		Find(&res)
+
 	if result.Error != nil {
 		repo.logger.Error("Unable to get training plans with pagination", zap.Error(result.Error), zap.Any("request", req))
 		return trainings.GetTrainingsResponse{}, result.Error
+	}
+
+	type Result struct {
+		models.TrainingPlan
+		MeanScore float32
+	}
+
+	var results []Result
+	result.Scan(&results)
+
+	for i := range res {
+		res[i].MeanScore = results[i].MeanScore
 	}
 
 	return trainings.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil

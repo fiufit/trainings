@@ -16,4 +16,5 @@ var (
 	ErrReviewAlreadyExists  = errors.New("user already reviewed the training")
 	ErrReviewNotFound       = errors.New("review not found")
 	ErrUnauthorizedReviewer = errors.New("user is not the review creator")
+	ErrInvalidTag           = errors.New("invalid tag")
 )

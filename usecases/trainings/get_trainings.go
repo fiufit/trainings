@@ -12,16 +12,18 @@ import (
 type TrainingGetter interface {
 	GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
 	GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error)
+	GetRecommendedPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
 }
 
 type TrainingGetterImpl struct {
 	trainings repositories.TrainingPlans
 	firebase  repositories.Firebase
+	users     repositories.Users
 	logger    *zap.Logger
 }
 
-func NewTrainingGetterImpl(trainings repositories.TrainingPlans, firebase repositories.Firebase, logger *zap.Logger) TrainingGetterImpl {
-	return TrainingGetterImpl{trainings: trainings, firebase: firebase, logger: logger}
+func NewTrainingGetterImpl(trainings repositories.TrainingPlans, firebase repositories.Firebase, users repositories.Users, logger *zap.Logger) TrainingGetterImpl {
+	return TrainingGetterImpl{trainings: trainings, firebase: firebase, users: users, logger: logger}
 }
 
 func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error) {
@@ -33,6 +35,27 @@ func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req training
 		uc.fillTrainingPicture(ctx, &res.TrainingPlans[i])
 	}
 	return res, nil
+}
+
+func (uc *TrainingGetterImpl) GetRecommendedPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error) {
+	user, err := uc.users.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		return trainings.GetTrainingsResponse{}, err
+	}
+
+	// ignore every other parameter in the request except pagination if the userID is set
+	cleanReq := trainings.GetTrainingsRequest{Pagination: req.Pagination}
+
+	interestStrings := make([]string, len(user.Interests))
+	for i, interest := range user.Interests {
+		interestStrings[i] = interest.Name
+	}
+	cleanReq.TagStrings = interestStrings
+	if err = cleanReq.Validate(); err != nil {
+		return trainings.GetTrainingsResponse{}, err
+	}
+
+	return uc.GetTrainingPlans(ctx, cleanReq)
 }
 
 func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error) {

@@ -48,7 +48,7 @@ func NewServer() *Server {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{}, &models.Review{})
+	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{}, &models.Review{}, &models.Tag{})
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +75,7 @@ func NewServer() *Server {
 
 	// USECASES
 	createTrainingUc := trainings.NewTrainingCreatorImpl(trainingRepo, userRepo, logger)
-	getTrainingUc := trainings.NewTrainingGetterImpl(trainingRepo, firebaseRepo, logger)
+	getTrainingUc := trainings.NewTrainingGetterImpl(trainingRepo, firebaseRepo, userRepo, logger)
 	updateTrainingUc := trainings.NewTrainingUpdaterImpl(trainingRepo, firebaseRepo, logger)
 	deleteTrainingUc := trainings.NewTrainingDeleterImpl(trainingRepo, logger)
 

@@ -24,10 +24,12 @@ func (h CreateTraining) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req trainings.CreateTrainingRequest
 		err := ctx.ShouldBindJSON(&req)
-		if err != nil {
+		validateErr := req.Validate()
+		if err != nil || validateErr != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
 			return
 		}
+
 		res, err := h.trainings.CreateTraining(ctx, req)
 		if err != nil {
 			if errors.Is(err, contracts.ErrUserNotFound) {

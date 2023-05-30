@@ -42,6 +42,8 @@ func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req train
 }
 
 func (uc *TrainingUpdaterImpl) patchTrainingModel(ctx context.Context, training models.TrainingPlan, req trainings.UpdateTrainingRequest) (models.TrainingPlan, error) {
+	training.Tags = req.Tags
+
 	if req.Name != "" {
 		training.Name = req.Name
 	}

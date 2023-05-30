@@ -24,7 +24,8 @@ func (h UpdateTraining) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req trainings.UpdateTrainingRequest
 		err := ctx.ShouldBindJSON(&req)
-		if err != nil {
+		validateErr := req.Validate()
+		if err != nil || validateErr != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
 			return
 		}

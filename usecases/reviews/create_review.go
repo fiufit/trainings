@@ -38,11 +38,12 @@ func (uc *ReviewCreatorImpl) CreateReview(ctx context.Context, req reviews.Creat
 		return models.Review{}, contracts.ErrSelfReview
 	}
 	newReview := models.Review{
-		TrainingPlanID: req.TrainingPlanID,
-		UserID:         req.UserID,
-		User:           usr,
-		Score:          req.Score,
-		Comment:        req.Comment,
+		TrainingPlanID:      req.TrainingPlanID,
+		TrainingPlanVersion: training.Version,
+		UserID:              req.UserID,
+		User:                usr,
+		Score:               req.Score,
+		Comment:             req.Comment,
 	}
 	createdReview, err := uc.reviews.CreateReview(ctx, newReview)
 	return createdReview, err

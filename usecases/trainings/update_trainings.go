@@ -25,42 +25,22 @@ func NewTrainingUpdaterImpl(trainings repositories.TrainingPlans, firebase repos
 }
 
 func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req trainings.UpdateTrainingRequest) (models.TrainingPlan, error) {
-	training, err := uc.getTrainingPlan(ctx, req.ID, req.TrainerID)
-	if err != nil {
-		return models.TrainingPlan{}, err
-	}
-	patchedTraining, err := uc.patchTrainingModel(ctx, training, req)
+	oldTraining, err := uc.getTrainingPlan(ctx, req.ID, req.TrainerID)
 	if err != nil {
 		return models.TrainingPlan{}, err
 	}
 
-	updatedTraining, err := uc.trainings.UpdateTrainingPlan(ctx, patchedTraining)
+	training := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
+	training.ID = oldTraining.ID
+
+	trainingPictureUrl := uc.firebase.GetTrainingPictureUrl(ctx, req.ID, req.TrainerID)
+	training.PictureUrl = trainingPictureUrl
+
+	updatedTraining, err := uc.trainings.UpdateTrainingPlan(ctx, training)
 	if err != nil {
 		return models.TrainingPlan{}, err
 	}
 	return updatedTraining, nil
-}
-
-func (uc *TrainingUpdaterImpl) patchTrainingModel(ctx context.Context, training models.TrainingPlan, req trainings.UpdateTrainingRequest) (models.TrainingPlan, error) {
-	training.Tags = req.Tags
-
-	if req.Name != "" {
-		training.Name = req.Name
-	}
-
-	if req.Description != "" {
-		training.Description = req.Description
-	}
-
-	if req.Difficulty != "" {
-		training.Difficulty = req.Difficulty
-	}
-
-	if req.Duration != 0 {
-		training.Duration = req.Duration
-	}
-
-	return training, nil
 }
 
 func (uc *TrainingUpdaterImpl) getTrainingPlan(ctx context.Context, trainingID uint, trainerID string) (models.TrainingPlan, error) {
@@ -71,7 +51,5 @@ func (uc *TrainingUpdaterImpl) getTrainingPlan(ctx context.Context, trainingID u
 	if training.TrainerID != trainerID {
 		return models.TrainingPlan{}, contracts.ErrUnauthorizedTrainer
 	}
-	trainingPictureUrl := uc.firebase.GetTrainingPictureUrl(ctx, trainingID, trainerID)
-	training.PictureUrl = trainingPictureUrl
 	return training, nil
 }

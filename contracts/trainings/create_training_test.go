@@ -81,10 +81,12 @@ func TestConverToTrainingPlanOk(t *testing.T) {
 	}
 	reqs := []ExerciseRequest{req1, req2}
 	req := CreateTrainingRequest{
-		Name:        "Test Training Name",
-		Description: "Test Training Description",
-		TrainerID:   "Test Trainer ID",
-		Exercises:   reqs,
+		BaseTrainingRequest: BaseTrainingRequest{
+			Name:        "Test Training Name",
+			Description: "Test Training Description",
+			TrainerID:   "Test Trainer ID",
+			Exercises:   reqs,
+		},
 	}
 
 	exercise1 := models.Exercise{
@@ -110,7 +112,7 @@ func TestConverToTrainingPlanOk(t *testing.T) {
 		Exercises:   []models.Exercise{exercise1, exercise2},
 	}
 
-	res := ConverToTrainingPlan(req)
+	res := ConverToTrainingPlan(req.BaseTrainingRequest)
 
 	assert.Equal(t, res, training)
 }

@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
+type UserInterest struct {
+	Name string
+}
+
 type User struct {
 	ID                string
 	Nickname          string
@@ -18,6 +22,6 @@ type User struct {
 	Weight            uint
 	IsVerifiedTrainer bool
 	MainLocation      string
-	Interests         []string
+	Interests         []UserInterest
 	PictureUrl        string
 }

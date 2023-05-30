@@ -45,8 +45,13 @@ func (uc *TrainingGetterImpl) GetRecommendedPlans(ctx context.Context, req train
 
 	// ignore every other parameter in the request except pagination if the userID is set
 	cleanReq := trainings.GetTrainingsRequest{Pagination: req.Pagination}
-	cleanReq.TagStrings = user.Interests
-	if err = req.Validate(); err != nil {
+
+	interestStrings := make([]string, len(user.Interests))
+	for i, interest := range user.Interests {
+		interestStrings[i] = interest.Name
+	}
+	cleanReq.TagStrings = interestStrings
+	if err = cleanReq.Validate(); err != nil {
 		return trainings.GetTrainingsResponse{}, err
 	}
 

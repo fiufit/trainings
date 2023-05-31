@@ -7,10 +7,14 @@ import (
 )
 
 type CreateTrainingRequest struct {
+	BaseTrainingRequest
+}
+
+type BaseTrainingRequest struct {
+	TrainerID   string            `json:"trainer_id" binding:"required"`
 	Name        string            `json:"name" binding:"required"`
 	Description string            `json:"description" binding:"required"`
 	Difficulty  string            `json:"difficulty" binding:"required"`
-	TrainerID   string            `json:"trainer_id" binding:"required"`
 	Duration    uint              `json:"duration" binding:"required"`
 	Exercises   []ExerciseRequest `json:"exercises" binding:"required"`
 	Tags        []models.Tag      `json:"-"`
@@ -52,7 +56,7 @@ func ConvertToExercises(exerciseReqs []ExerciseRequest) []models.Exercise {
 	return exercises
 }
 
-func ConverToTrainingPlan(trainingReq CreateTrainingRequest) models.TrainingPlan {
+func ConverToTrainingPlan(trainingReq BaseTrainingRequest) models.TrainingPlan {
 	exercises := ConvertToExercises(trainingReq.Exercises)
 	return models.TrainingPlan{
 		Name:        trainingReq.Name,

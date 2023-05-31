@@ -27,7 +27,7 @@ func (uc *TrainingCreatorImpl) CreateTraining(ctx context.Context, req trainings
 	if err != nil {
 		return trainings.CreateTrainingResponse{}, err
 	}
-	newTraining := trainings.ConverToTrainingPlan(req)
+	newTraining := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
 	createdTraining, err := uc.trainings.CreateTrainingPlan(ctx, newTraining)
 	return trainings.CreateTrainingResponse{TrainingPlan: createdTraining}, err
 }

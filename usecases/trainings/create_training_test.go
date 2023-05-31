@@ -25,15 +25,18 @@ func TestCreateTrainingOk(t *testing.T) {
 		t.Fatal(err)
 	}
 	req := trainings.CreateTrainingRequest{
-		Name:        "Test Name",
-		Description: "Test Description",
-		TrainerID:   "Test Trainer",
-		Exercises:   []trainings.ExerciseRequest{},
+		BaseTrainingRequest: trainings.BaseTrainingRequest{
+			Name:        "Test Name",
+			Description: "Test Description",
+			TrainerID:   "Test Trainer",
+			Exercises:   []trainings.ExerciseRequest{},
+		},
 	}
+
 	trainingRepo := new(mocks.TrainingPlans)
 	userRepo := new(mocks.Users)
 
-	training := trainings.ConverToTrainingPlan(req)
+	training := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(training, nil)
 	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{}, nil)
 
@@ -48,15 +51,17 @@ func TestCreateTrainingError(t *testing.T) {
 
 	ctx := context.Background()
 	req := trainings.CreateTrainingRequest{
-		Name:        "Test Name",
-		Description: "Test Description",
-		TrainerID:   "Test Trainer",
-		Exercises:   []trainings.ExerciseRequest{},
+		BaseTrainingRequest: trainings.BaseTrainingRequest{
+			Name:        "Test Name",
+			Description: "Test Description",
+			TrainerID:   "Test Trainer",
+			Exercises:   []trainings.ExerciseRequest{},
+		},
 	}
 	trainingRepo := new(mocks.TrainingPlans)
 	userRepo := new(mocks.Users)
 
-	training := trainings.ConverToTrainingPlan(req)
+	training := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(models.TrainingPlan{}, errors.New("repo error"))
 	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{}, nil)
 

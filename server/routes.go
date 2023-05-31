@@ -26,7 +26,7 @@ func (s *Server) InitTrainingRoutes(router *gin.RouterGroup) {
 		"v1": s.getTrainings.Handle(),
 	}))
 
-	router.PATCH("/:trainingID", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+	router.PUT("/:trainingID", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.updateTraining.Handle(),
 	}))
 

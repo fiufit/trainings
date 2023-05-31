@@ -3,14 +3,8 @@ package trainings
 import "github.com/fiufit/trainings/models"
 
 type UpdateTrainingRequest struct {
-	ID          uint
-	TrainerID   string       `json:"trainer_id"`
-	Name        string       `json:"name"`
-	Description string       `json:"description"`
-	Difficulty  string       `json:"difficulty"`
-	Duration    uint         `json:"duration"`
-	TagStrings  []string     `json:"tags"`
-	Tags        []models.Tag `json:"-"`
+	ID uint
+	BaseTrainingRequest
 }
 
 type UpdateTrainingResponse struct {

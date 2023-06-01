@@ -124,16 +124,17 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 	}
 	if len(req.Tags) > 0 {
 		db = db.InnerJoins("INNER JOIN training_plan_tags ON training_plan_tags.training_plan_id = training_plans.id AND "+
-			"training_plan_tags.training_plan_version = training_plans.version").Where("training_plan_tags.tag_name IN (?)", req.TagStrings)
+			"training_plan_tags.training_plan_version = training_plans.version").Distinct().Where("training_plan_tags.tag_name IN (?)", req.TagStrings)
 	}
+
+	db = db.Select("training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score").
+		Order("mean_score DESC")
 
 	result := db.
 		Scopes(database.Paginate(res, &req.Pagination, db)).
 		Preload("Exercises").
 		Preload("Reviews").
 		Preload("Tags").
-		Select("training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score").
-		Order("mean_score DESC").
 		Find(&res)
 
 	if result.Error != nil {

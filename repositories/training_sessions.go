@@ -68,10 +68,16 @@ func (repo TrainingSessionsRepository) Get(ctx context.Context, req tsContracts.
 	db = db.Where("user_id = ?", req.UserID)
 
 	if req.TrainingID != 0 {
-		db = db.Where("training_id = ?", req.TrainingID)
+		db = db.Where("training_plan_id = ?", req.TrainingID)
 	}
 
-	res := db.Unscoped().Scopes(database.Paginate(sessions, &req.Pagination, db)).Order("updated_at desc").Preload("TrainingPlans").Preload("ExerciseSessions").Preload("Exercises").Find(&sessions)
+	res := db.Unscoped().Scopes(database.Paginate(sessions, &req.Pagination, db)).Order("updated_at desc").
+		Preload("TrainingPlan").
+		Preload("TrainingPlan.Exercises").
+		Preload("ExerciseSessions").
+		Preload("ExerciseSessions.Exercise").
+		Preload("TrainingPlan.Tags").
+		Find(&sessions)
 	if res.Error != nil {
 		repo.logger.Error(res.Error.Error(), zap.Any("req", req))
 		return nil, res.Error

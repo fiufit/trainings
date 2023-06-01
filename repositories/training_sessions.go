@@ -47,7 +47,12 @@ func (repo TrainingSessionsRepository) Create(ctx context.Context, session model
 func (repo TrainingSessionsRepository) GetByID(ctx context.Context, sessionID uint) (models.TrainingSession, error) {
 	db := repo.db.WithContext(ctx)
 	var session models.TrainingSession
-	res := db.First(&session, "id = ?", sessionID)
+	res := db.Preload("TrainingPlan").
+		Preload("TrainingPlan.Exercises").
+		Preload("ExerciseSessions").
+		Preload("ExerciseSessions.Exercise").
+		Preload("TrainingPlan.Tags").
+		First(&session, "id = ?", sessionID)
 
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
@@ -87,7 +92,7 @@ func (repo TrainingSessionsRepository) Get(ctx context.Context, req tsContracts.
 
 func (repo TrainingSessionsRepository) Update(ctx context.Context, session models.TrainingSession) (models.TrainingSession, error) {
 	db := repo.db.WithContext(ctx)
-	res := db.Save(&session)
+	res := db.Session(&gorm.Session{FullSaveAssociations: true}).Save(&session)
 
 	if res.Error != nil {
 		repo.logger.Error(res.Error.Error(), zap.Any("session", session))

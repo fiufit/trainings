@@ -26,6 +26,7 @@ func (h UpdateTrainingSessions) Handle() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
 			return
 		}
+		req.ID = ctx.MustGet("trainingSessionID").(uint)
 
 		ts, err := h.uc.UpdateTrainingSession(ctx, req)
 		if err != nil {

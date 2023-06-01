@@ -41,18 +41,18 @@ func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context,
 		for i, exerciseSession := range ts.ExerciseSessions {
 			if exerciseSession.ID == exerciseSessionRequest.ID {
 
-				if req.Done && !exerciseSessionRequest.Done {
+				if *req.Done && !*exerciseSessionRequest.Done {
 					return tsContracts.UpdateTrainingSessionResponse{}, contracts.ErrTrainingSessionNotComplete
 				}
 
-				ts.ExerciseSessions[i].Done = exerciseSessionRequest.Done
+				ts.ExerciseSessions[i].Done = *exerciseSessionRequest.Done
 			}
 		}
 	}
 
 	ts.StepCount = req.StepCount
 	ts.SecondsCount = req.SecondsCount
-	ts.Done = req.Done
+	ts.Done = *req.Done
 	ts.UpdatedAt = time.Now()
 
 	updatedSession, err := uc.sessions.Update(ctx, ts)

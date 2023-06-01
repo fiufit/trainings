@@ -10,11 +10,31 @@ func (s *Server) InitRoutes() {
 	trainingRouter := baseRouter.Group("/trainings")
 	exerciseRouter := trainingRouter.Group("/:trainingID/exercises")
 	reviewRouter := trainingRouter.Group("/:trainingID/reviews")
+	sessionRouter := baseRouter.Group("/training_sessions")
 
 	s.InitTrainingRoutes(trainingRouter)
 	s.InitExerciseRoutes(exerciseRouter)
 	s.InitReviewRoutes(reviewRouter)
+	s.InitTrainingSessionRoutes(sessionRouter)
 
+}
+
+func (s *Server) InitTrainingSessionRoutes(router *gin.RouterGroup) {
+	router.POST("", middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.createTrainingSession.Handle(),
+	}))
+
+	router.GET("", middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getTrainingSessions.Handle(),
+	}))
+
+	router.GET("/:trainingSessionID", middleware.BindTrainingSessionIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getTrainingSessionByID.Handle(),
+	}))
+
+	router.PUT("/:trainingSessionID", middleware.BindTrainingSessionIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.updateTrainingSession.Handle(),
+	}))
 }
 
 func (s *Server) InitTrainingRoutes(router *gin.RouterGroup) {

@@ -8,31 +8,37 @@ import (
 	"github.com/fiufit/trainings/database"
 	exerciseHandlers "github.com/fiufit/trainings/handlers/exercises"
 	reviewHandlers "github.com/fiufit/trainings/handlers/reviews"
+	trainingSessionHandlers "github.com/fiufit/trainings/handlers/training_sessions"
 	trainingHandlers "github.com/fiufit/trainings/handlers/trainings"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"github.com/fiufit/trainings/usecases/exercises"
 	"github.com/fiufit/trainings/usecases/reviews"
+	"github.com/fiufit/trainings/usecases/training_sessions"
 	"github.com/fiufit/trainings/usecases/trainings"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type Server struct {
-	router         *gin.Engine
-	createTraining trainingHandlers.CreateTraining
-	getTrainings   trainingHandlers.GetTrainings
-	updateTraining trainingHandlers.UpdateTraining
-	deleteTraining trainingHandlers.DeleteTraining
-	createExercise exerciseHandlers.CreateExercise
-	deleteExercise exerciseHandlers.DeleteExercise
-	updateExercise exerciseHandlers.UpdateExercise
-	getExercise    exerciseHandlers.GetExercise
-	createReview   reviewHandlers.CreateReview
-	updateReview   reviewHandlers.UpdateReview
-	getReviews     reviewHandlers.GetReviews
-	getReviewByID  reviewHandlers.GetReviewByID
-	deleteReview   reviewHandlers.DeleteReview
+	router                 *gin.Engine
+	createTraining         trainingHandlers.CreateTraining
+	getTrainings           trainingHandlers.GetTrainings
+	updateTraining         trainingHandlers.UpdateTraining
+	deleteTraining         trainingHandlers.DeleteTraining
+	createExercise         exerciseHandlers.CreateExercise
+	deleteExercise         exerciseHandlers.DeleteExercise
+	updateExercise         exerciseHandlers.UpdateExercise
+	getExercise            exerciseHandlers.GetExercise
+	createReview           reviewHandlers.CreateReview
+	updateReview           reviewHandlers.UpdateReview
+	getReviews             reviewHandlers.GetReviews
+	getReviewByID          reviewHandlers.GetReviewByID
+	deleteReview           reviewHandlers.DeleteReview
+	createTrainingSession  trainingSessionHandlers.CreateTrainingSession
+	updateTrainingSession  trainingSessionHandlers.UpdateTrainingSessions
+	getTrainingSessions    trainingSessionHandlers.GetTrainingSessions
+	getTrainingSessionByID trainingSessionHandlers.GetTrainingSessionByID
 }
 
 func (s *Server) Run() {
@@ -48,7 +54,13 @@ func NewServer() *Server {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&models.TrainingPlan{}, &models.Exercise{}, &models.Review{}, &models.Tag{})
+	err = db.AutoMigrate(&models.TrainingPlan{},
+		&models.Exercise{},
+		&models.Review{},
+		&models.Tag{},
+		&models.TrainingSession{},
+		&models.ExerciseSession{},
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -65,9 +77,10 @@ func NewServer() *Server {
 
 	// REPOSITORIES
 	trainingRepo := repositories.NewTrainingRepository(db, logger)
-	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
 	exerciseRepo := repositories.NewExerciseRepository(db, logger)
+	trainingSessionRepo := repositories.NewTrainingSessionsRepository(db, logger)
 	reviewRepo := repositories.NewReviewRepository(db, logger)
+	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
 	firebaseRepo, err := repositories.NewFirebaseRepository(logger, sdkJson, bucketName)
 	if err != nil {
 		panic(err)
@@ -89,6 +102,10 @@ func NewServer() *Server {
 	updateReviewUc := reviews.NewReviewUpdaterImpl(trainingRepo, reviewRepo, userRepo, logger)
 	deleteReviewUc := reviews.NewReviewDeleterImpl(trainingRepo, reviewRepo, logger)
 
+	createTrainingSessionUc := training_sessions.NewTrainingSessionCreatorImpl(userRepo, trainingRepo, trainingSessionRepo, logger)
+	getTrainingSessionUc := training_sessions.NewTrainingSessionGetterImpl(trainingSessionRepo, logger)
+	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, logger)
+
 	// HANDLERS
 	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)
 	getTrainings := trainingHandlers.NewGetTrainings(&getTrainingUc, logger)
@@ -106,20 +123,29 @@ func NewServer() *Server {
 	updateReview := reviewHandlers.NewUpdateReview(&updateReviewUc, logger)
 	deleteReview := reviewHandlers.NewDeleteReview(&deleteReviewUc, logger)
 
+	createTrainingSession := trainingSessionHandlers.NewCreateTrainingSession(&createTrainingSessionUc)
+	getTrainingSessions := trainingSessionHandlers.NewGetTrainingSessions(&getTrainingSessionUc)
+	getTrainingSessionByID := trainingSessionHandlers.NewGetTrainingSessionByID(&getTrainingSessionUc)
+	updateTrainingSession := trainingSessionHandlers.NewUpdateTrainingSessions(&updateTrainingSessionUc)
+
 	return &Server{
-		router:         gin.Default(),
-		createTraining: createTraining,
-		getTrainings:   getTrainings,
-		updateTraining: updateTraining,
-		createExercise: createExercise,
-		deleteExercise: deleteExercise,
-		updateExercise: updateExercise,
-		getExercise:    getExercise,
-		deleteTraining: deleteTraining,
-		createReview:   createReview,
-		getReviews:     getReviews,
-		getReviewByID:  getReviewByID,
-		updateReview:   updateReview,
-		deleteReview:   deleteReview,
+		router:                 gin.Default(),
+		createTraining:         createTraining,
+		getTrainings:           getTrainings,
+		updateTraining:         updateTraining,
+		createExercise:         createExercise,
+		deleteExercise:         deleteExercise,
+		updateExercise:         updateExercise,
+		getExercise:            getExercise,
+		deleteTraining:         deleteTraining,
+		createReview:           createReview,
+		getReviews:             getReviews,
+		getReviewByID:          getReviewByID,
+		updateReview:           updateReview,
+		deleteReview:           deleteReview,
+		createTrainingSession:  createTrainingSession,
+		getTrainingSessions:    getTrainingSessions,
+		getTrainingSessionByID: getTrainingSessionByID,
+		updateTrainingSession:  updateTrainingSession,
 	}
 }

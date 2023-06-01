@@ -21,6 +21,10 @@ type TrainingSessionCreatorImpl struct {
 	logger    *zap.Logger
 }
 
+func NewTrainingSessionCreatorImpl(users repositories.Users, trainings repositories.TrainingPlans, sessions repositories.TrainingSessions, logger *zap.Logger) TrainingSessionCreatorImpl {
+	return TrainingSessionCreatorImpl{users: users, trainings: trainings, sessions: sessions, logger: logger}
+}
+
 func (uc *TrainingSessionCreatorImpl) CreateTrainingSession(ctx context.Context, trainingID uint, userID string) (tsContracts.CreateTrainingSessionResponse, error) {
 	_, err := uc.users.GetUserByID(ctx, userID)
 	if err != nil {
@@ -33,7 +37,11 @@ func (uc *TrainingSessionCreatorImpl) CreateTrainingSession(ctx context.Context,
 	}
 
 	session := makeTrainingSession(training, userID)
-	return uc.sessions.Create(ctx, session)
+	createdSession, err := uc.sessions.Create(ctx, session)
+	if err != nil {
+		return tsContracts.CreateTrainingSessionResponse{}, err
+	}
+	return tsContracts.CreateTrainingSessionResponse{Session: createdSession}, nil
 }
 
 func makeTrainingSession(training models.TrainingPlan, userID string) models.TrainingSession {

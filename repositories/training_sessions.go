@@ -47,7 +47,7 @@ func (repo TrainingSessionsRepository) Create(ctx context.Context, session model
 func (repo TrainingSessionsRepository) GetByID(ctx context.Context, sessionID uint) (models.TrainingSession, error) {
 	db := repo.db.WithContext(ctx)
 	var session models.TrainingSession
-	res := db.Preload("TrainingPlan").
+	res := db.Unscoped().Preload("TrainingPlan").
 		Preload("TrainingPlan.Exercises").
 		Preload("ExerciseSessions").
 		Preload("ExerciseSessions.Exercise").

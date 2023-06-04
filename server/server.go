@@ -103,8 +103,8 @@ func NewServer() *Server {
 	deleteReviewUc := reviews.NewReviewDeleterImpl(trainingRepo, reviewRepo, logger)
 
 	createTrainingSessionUc := training_sessions.NewTrainingSessionCreatorImpl(userRepo, trainingRepo, trainingSessionRepo, logger)
-	getTrainingSessionUc := training_sessions.NewTrainingSessionGetterImpl(trainingSessionRepo, logger)
-	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, logger)
+	getTrainingSessionUc := training_sessions.NewTrainingSessionGetterImpl(trainingSessionRepo, firebaseRepo, logger)
+	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, logger)
 
 	// HANDLERS
 	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)

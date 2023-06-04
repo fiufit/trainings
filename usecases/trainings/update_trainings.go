@@ -33,8 +33,7 @@ func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req train
 	training := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
 	training.ID = oldTraining.ID
 
-	trainingPictureUrl := uc.firebase.GetTrainingPictureUrl(ctx, req.ID, req.TrainerID)
-	training.PictureUrl = trainingPictureUrl
+	uc.firebase.FillTrainingPicture(ctx, &training)
 
 	updatedTraining, err := uc.trainings.UpdateTrainingPlan(ctx, training)
 	if err != nil {

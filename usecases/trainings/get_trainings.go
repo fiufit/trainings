@@ -32,7 +32,7 @@ func (uc *TrainingGetterImpl) GetTrainingPlans(ctx context.Context, req training
 		return res, err
 	}
 	for i := range res.TrainingPlans {
-		uc.fillTrainingPicture(ctx, &res.TrainingPlans[i])
+		uc.firebase.FillTrainingPicture(ctx, &res.TrainingPlans[i])
 	}
 	return res, nil
 }
@@ -63,11 +63,6 @@ func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, trainingID ui
 	if err != nil {
 		return training, err
 	}
-	uc.fillTrainingPicture(ctx, &training)
+	uc.firebase.FillTrainingPicture(ctx, &training)
 	return training, nil
-}
-
-func (uc *TrainingGetterImpl) fillTrainingPicture(ctx context.Context, training *models.TrainingPlan) {
-	trainingPictureUrl := uc.firebase.GetTrainingPictureUrl(ctx, training.ID, training.TrainerID)
-	(*training).PictureUrl = trainingPictureUrl
 }

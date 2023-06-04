@@ -16,12 +16,13 @@ type TrainingSessionGetter interface {
 }
 
 type TrainingSessionGetterImpl struct {
+	firebase repositories.Firebase
 	sessions repositories.TrainingSessions
 	logger   *zap.Logger
 }
 
-func NewTrainingSessionGetterImpl(sessions repositories.TrainingSessions, logger *zap.Logger) TrainingSessionGetterImpl {
-	return TrainingSessionGetterImpl{sessions: sessions, logger: logger}
+func NewTrainingSessionGetterImpl(sessions repositories.TrainingSessions, firebase repositories.Firebase, logger *zap.Logger) TrainingSessionGetterImpl {
+	return TrainingSessionGetterImpl{sessions: sessions, firebase: firebase, logger: logger}
 }
 
 func (uc *TrainingSessionGetterImpl) GetByID(ctx context.Context, sessionID uint, requesterID string) (models.TrainingSession, error) {
@@ -35,6 +36,9 @@ func (uc *TrainingSessionGetterImpl) GetByID(ctx context.Context, sessionID uint
 	if err != nil {
 		return models.TrainingSession{}, err
 	}
+
+	uc.firebase.FillTrainingPicture(ctx, &session.TrainingPlan)
+
 	return session, nil
 }
 
@@ -42,6 +46,10 @@ func (uc *TrainingSessionGetterImpl) Get(ctx context.Context, req tsContracts.Ge
 	sessions, err := uc.sessions.Get(ctx, req)
 	if err != nil {
 		return tsContracts.GetTrainingSessionsResponse{}, err
+	}
+
+	for i, _ := range sessions {
+		uc.firebase.FillTrainingPicture(ctx, &(sessions[i].TrainingPlan))
 	}
 
 	res := tsContracts.GetTrainingSessionsResponse{

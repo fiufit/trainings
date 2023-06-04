@@ -9,12 +9,14 @@ import (
 	"cloud.google.com/go/storage"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
+	"github.com/fiufit/trainings/models"
 	"go.uber.org/zap"
 	"google.golang.org/api/option"
 )
 
 type Firebase interface {
 	GetTrainingPictureUrl(ctx context.Context, trainingID uint, trainerID string) string
+	FillTrainingPicture(ctx context.Context, training *models.TrainingPlan)
 }
 
 type FirebaseRepository struct {
@@ -56,6 +58,11 @@ func NewFirebaseRepository(logger *zap.Logger, sdkJson []byte, storageBucketName
 	}
 
 	return repo, nil
+}
+
+func (repo FirebaseRepository) FillTrainingPicture(ctx context.Context, training *models.TrainingPlan) {
+	trainingPictureUrl := repo.GetTrainingPictureUrl(ctx, training.ID, training.TrainerID)
+	(*training).PictureUrl = trainingPictureUrl
 }
 
 func (repo FirebaseRepository) GetTrainingPictureUrl(ctx context.Context, trainingID uint, trainerID string) string {

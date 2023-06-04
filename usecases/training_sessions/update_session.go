@@ -16,11 +16,12 @@ type TrainingSessionUpdater interface {
 
 type TrainingSessionUpdaterImpl struct {
 	sessions repositories.TrainingSessions
+	firebase repositories.Firebase
 	logger   *zap.Logger
 }
 
-func NewTrainingSessionUpdaterImpl(sessions repositories.TrainingSessions, logger *zap.Logger) TrainingSessionUpdaterImpl {
-	return TrainingSessionUpdaterImpl{sessions: sessions, logger: logger}
+func NewTrainingSessionUpdaterImpl(sessions repositories.TrainingSessions, firebase repositories.Firebase, logger *zap.Logger) TrainingSessionUpdaterImpl {
+	return TrainingSessionUpdaterImpl{sessions: sessions, firebase: firebase, logger: logger}
 }
 
 func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context, req tsContracts.UpdateTrainingSessionRequest) (tsContracts.UpdateTrainingSessionResponse, error) {
@@ -50,8 +51,8 @@ func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context,
 		}
 	}
 
-	ts.StepCount = req.StepCount
-	ts.SecondsCount = req.SecondsCount
+	ts.StepCount = *req.StepCount
+	ts.SecondsCount = *req.SecondsCount
 	ts.Done = *req.Done
 	ts.UpdatedAt = time.Now()
 
@@ -59,6 +60,8 @@ func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context,
 	if err != nil {
 		return tsContracts.UpdateTrainingSessionResponse{}, err
 	}
+
+	uc.firebase.FillTrainingPicture(ctx, &updatedSession.TrainingPlan)
 
 	return tsContracts.UpdateTrainingSessionResponse{Session: updatedSession}, nil
 }

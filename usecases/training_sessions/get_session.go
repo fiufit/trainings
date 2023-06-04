@@ -48,7 +48,7 @@ func (uc *TrainingSessionGetterImpl) Get(ctx context.Context, req tsContracts.Ge
 		return tsContracts.GetTrainingSessionsResponse{}, err
 	}
 
-	for i, _ := range sessions {
+	for i := range sessions {
 		uc.firebase.FillTrainingPicture(ctx, &(sessions[i].TrainingPlan))
 	}
 

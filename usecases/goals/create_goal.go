@@ -35,6 +35,7 @@ func (uc *GoalCreatorImpl) CreateGoal(ctx context.Context, req goals.CreateGoalR
 		GoalType:          req.GoalType,
 		GoalSubtype:       req.GoalSubtype,
 		Deadline:          req.Deadline,
+		UserID:            req.UserID,
 	}
 	createdGoal, err := uc.goals.Create(ctx, newGoal)
 	return createdGoal, err

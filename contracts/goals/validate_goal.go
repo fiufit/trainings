@@ -5,13 +5,13 @@ import (
 )
 
 var validGoalTypes = map[string]struct{}{
-	"step_count":     {},
-	"minutes_count":  {},
-	"sessions_count": {},
+	"step count":     {},
+	"minutes count":  {},
+	"sessions count": {},
 }
 
 var validGoalSubtypes = map[string]map[string]struct{}{
-	"sessions_count": {
+	"sessions count": {
 		"beginner":     {},
 		"intermediate": {},
 		"expert":       {},

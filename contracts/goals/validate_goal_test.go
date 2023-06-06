@@ -7,12 +7,12 @@ import (
 )
 
 func TestValidateValidTypeWithNoSubtypeOk(t *testing.T) {
-	err := ValidateGoalType("step_count", "")
+	err := ValidateGoalType("step count", "")
 	assert.NoError(t, err)
 }
 
 func TestValidateValidTypeWithNoSubtypeErr(t *testing.T) {
-	err := ValidateGoalType("step_count", "subtipo que no existe")
+	err := ValidateGoalType("step count", "subtipo que no existe")
 	assert.Error(t, err)
 
 }
@@ -28,17 +28,17 @@ func TestValidateInvalidTypeWithNoSubtype2Err(t *testing.T) {
 }
 
 func TestValidateValidTypeWithSubtypeOk(t *testing.T) {
-	err := ValidateGoalType("sessions_count", "beginner")
+	err := ValidateGoalType("sessions count", "beginner")
 	assert.NoError(t, err)
 }
 
 func TestValidateValidTypeWithSubtypeErr(t *testing.T) {
-	err := ValidateGoalType("sessions_count", "")
+	err := ValidateGoalType("sessions count", "")
 	assert.Error(t, err)
 
 }
 
 func TestValidateValidTypeWithSubtypeErr2(t *testing.T) {
-	err := ValidateGoalType("sessions_count", "subtipo que no existe")
+	err := ValidateGoalType("sessions count", "subtipo que no existe")
 	assert.Error(t, err)
 }

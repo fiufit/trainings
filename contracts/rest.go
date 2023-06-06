@@ -14,6 +14,8 @@ var errCodes = map[error]string{
 	ErrTrainingSessionNotFound:        "T10",
 	ErrTrainingSessionNotComplete:     "T11",
 	ErrTrainingSessionAlreadyFinished: "T12",
+	ErrInvalidGoalType:                "T13",
+	ErrInvalidGoalSubtype:             "T14",
 	ErrUserInternal:                   "U0",
 	ErrUserBadRequest:                 "U1",
 	ErrUserNotFound:                   "U2",

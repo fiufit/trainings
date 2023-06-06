@@ -21,4 +21,6 @@ var (
 	ErrTrainingSessionNotComplete     = errors.New("can't complete training session without completing exercises")
 	ErrTrainingSessionAlreadyFinished = errors.New("can't modify an already finished training session")
 	ErrUnauthorizedAthlete            = errors.New("user is not the training session creator")
+	ErrInvalidGoalType                = errors.New("invalid goal type")
+	ErrInvalidGoalSubtype             = errors.New("invalid goal subtype")
 )

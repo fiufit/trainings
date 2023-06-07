@@ -64,7 +64,9 @@ func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context,
 
 	if updatedSession.Done {
 		err = uc.goals.UpdateBySession(ctx, updatedSession)
-		uc.logger.Error("aaaaaaaaaaaaaaaaaaaaaaaaa", zap.Error(err))
+		if err != nil {
+			uc.logger.Error("Unable to update user goal", zap.Error(err))
+		}
 	}
 
 	uc.firebase.FillTrainingPicture(ctx, &updatedSession.TrainingPlan)

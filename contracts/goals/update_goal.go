@@ -15,7 +15,7 @@ type UpdateGoalRequest struct {
 }
 
 func (req *UpdateGoalRequest) Validate() error {
-	if req.Deadline.Before(time.Now()) {
+	if !req.Deadline.IsZero() && req.Deadline.Before(time.Now()) {
 		return contracts.ErrBadRequest
 	}
 	return nil

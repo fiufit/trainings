@@ -7,9 +7,9 @@ import (
 )
 
 type UpdateGoalRequest struct {
-	Title     string    `json:"title" binding:"required"`
-	GoalValue uint      `json:"value" binding:"required"`
-	Deadline  time.Time `json:"deadline" binding:"required"`
+	Title     string    `json:"title"`
+	GoalValue uint      `json:"value"`
+	Deadline  time.Time `json:"deadline"`
 	UserID    string    `json:"user_id" binding:"required"`
 	GoalID    uint
 }

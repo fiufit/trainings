@@ -26,12 +26,12 @@ func (s *Server) InitGoalsRoutes(router *gin.RouterGroup) {
 		"v1": s.createGoal.Handle(),
 	}))
 
-	router.GET("/:userID", middleware.BindUserIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
-		"v1": s.getGoalByID.Handle(),
-	}))
-
 	router.GET("", middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.getGoals.Handle(),
+	}))
+
+	router.GET("/:goalID", middleware.BindGoalIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getGoalByID.Handle(),
 	}))
 
 	router.PATCH("/:goalID", middleware.BindGoalIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{

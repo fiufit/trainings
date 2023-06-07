@@ -42,6 +42,10 @@ type Server struct {
 	getTrainingSessions    trainingSessionHandlers.GetTrainingSessions
 	getTrainingSessionByID trainingSessionHandlers.GetTrainingSessionByID
 	createGoal             goalsHandlers.CreateGoal
+	getGoalByID            goalsHandlers.GetGoalByID
+	getGoals               goalsHandlers.GetGoals
+	updateGoal             goalsHandlers.UpdateGoal
+	deleteGoal             goalsHandlers.DeleteGoal
 }
 
 func (s *Server) Run() {
@@ -112,6 +116,9 @@ func NewServer() *Server {
 	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, logger)
 
 	createGoalUc := goals.NewGoalCreatorImpl(userRepo, goalRepo, logger)
+	getGoalUc := goals.NewGoalGetterImpl(goalRepo, logger)
+	updateGoalUc := goals.NewGoalUpdaterImpl(goalRepo, logger)
+	deleteGoalUc := goals.NewGoalDeleterImpl(goalRepo, logger)
 
 	// HANDLERS
 	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)
@@ -136,6 +143,10 @@ func NewServer() *Server {
 	updateTrainingSession := trainingSessionHandlers.NewUpdateTrainingSessions(&updateTrainingSessionUc)
 
 	createGoal := goalsHandlers.NewCreateGoal(&createGoalUc, logger)
+	getGoalByID := goalsHandlers.NewGetGoalByID(&getGoalUc, logger)
+	getGoals := goalsHandlers.NewGetGoals(&getGoalUc, logger)
+	updateGoal := goalsHandlers.NewUpdateGoal(&updateGoalUc, logger)
+	deleteGoal := goalsHandlers.NewDeleteGoal(&deleteGoalUc, logger)
 
 	return &Server{
 		router:                 gin.Default(),
@@ -157,5 +168,9 @@ func NewServer() *Server {
 		getTrainingSessionByID: getTrainingSessionByID,
 		updateTrainingSession:  updateTrainingSession,
 		createGoal:             createGoal,
+		getGoalByID:            getGoalByID,
+		getGoals:               getGoals,
+		updateGoal:             updateGoal,
+		deleteGoal:             deleteGoal,
 	}
 }

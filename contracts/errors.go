@@ -23,4 +23,5 @@ var (
 	ErrUnauthorizedAthlete            = errors.New("user is not the training session creator")
 	ErrInvalidGoalType                = errors.New("invalid goal type")
 	ErrInvalidGoalSubtype             = errors.New("invalid goal subtype")
+	ErrGoalNotFound                   = errors.New("goal not found")
 )

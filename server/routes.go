@@ -25,6 +25,22 @@ func (s *Server) InitGoalsRoutes(router *gin.RouterGroup) {
 	router.POST("", middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.createGoal.Handle(),
 	}))
+
+	router.GET("/:userID", middleware.BindUserIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getGoalByID.Handle(),
+	}))
+
+	router.GET("", middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getGoals.Handle(),
+	}))
+
+	router.PATCH("/:goalID", middleware.BindGoalIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.updateGoal.Handle(),
+	}))
+
+	router.DELETE("/:goalID", middleware.BindGoalIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.deleteGoal.Handle(),
+	}))
 }
 
 func (s *Server) InitTrainingSessionRoutes(router *gin.RouterGroup) {

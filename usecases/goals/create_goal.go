@@ -2,6 +2,7 @@ package goals
 
 import (
 	"context"
+	"strings"
 
 	"github.com/fiufit/trainings/contracts/goals"
 	"github.com/fiufit/trainings/models"
@@ -32,8 +33,8 @@ func (uc *GoalCreatorImpl) CreateGoal(ctx context.Context, req goals.CreateGoalR
 		Title:             req.Title,
 		GoalValue:         req.GoalValue,
 		GoalValueProgress: 0,
-		GoalType:          req.GoalType,
-		GoalSubtype:       req.GoalSubtype,
+		GoalType:          strings.ToLower(req.GoalType),
+		GoalSubtype:       strings.ToLower(req.GoalSubtype),
 		Deadline:          req.Deadline,
 		UserID:            req.UserID,
 	}

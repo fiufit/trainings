@@ -113,7 +113,7 @@ func NewServer() *Server {
 
 	createTrainingSessionUc := training_sessions.NewTrainingSessionCreatorImpl(userRepo, trainingRepo, trainingSessionRepo, logger)
 	getTrainingSessionUc := training_sessions.NewTrainingSessionGetterImpl(trainingSessionRepo, firebaseRepo, logger)
-	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, logger)
+	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, goalRepo, logger)
 
 	createGoalUc := goals.NewGoalCreatorImpl(userRepo, goalRepo, logger)
 	getGoalUc := goals.NewGoalGetterImpl(goalRepo, logger)

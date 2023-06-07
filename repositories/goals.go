@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/fiufit/trainings/contracts"
+	"github.com/fiufit/trainings/contracts/goals"
 	"github.com/fiufit/trainings/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -13,8 +14,9 @@ import (
 type Goals interface {
 	Create(ctx context.Context, goal models.Goal) (models.Goal, error)
 	GetByID(ctx context.Context, goalID uint) (models.Goal, error)
-	GetByUserID(ctx context.Context, userID string) ([]models.Goal, error)
+	Get(ctx context.Context, req goals.GetGoalsRequest) ([]models.Goal, error)
 	Update(ctx context.Context, goal models.Goal) (models.Goal, error)
+	//UpdateBySession(ctx context.Context)
 	Delete(ctx context.Context, goalID uint) error
 }
 
@@ -51,16 +53,29 @@ func (repo GoalsRepository) GetByID(ctx context.Context, goalID uint) (models.Go
 	return goal, nil
 }
 
-func (repo GoalsRepository) GetByUserID(ctx context.Context, userID string) ([]models.Goal, error) {
+func (repo GoalsRepository) Get(ctx context.Context, req goals.GetGoalsRequest) ([]models.Goal, error) {
 	var goals []models.Goal
 	db := repo.db.WithContext(ctx)
 
-	db = db.Where("user_id = ?", userID)
+	if req.UserID != "" {
+		db = db.Where("user_id = ?", req.UserID)
+	}
 
+	if req.GoalType != "" {
+		db = db.Where("goal_type = LOWER(?)", req.GoalType)
+	}
+
+	if req.GoalSubtype != "" {
+		db = db.Where("goal_subtype = LOWER(?)", req.GoalSubtype)
+	}
+
+	if !req.Deadline.IsZero() {
+		db = db.Where("deadline < ?", req.Deadline)
+	}
 	res := db.Order("created_at desc").Find(&goals)
 
 	if res.Error != nil {
-		repo.logger.Error(res.Error.Error(), zap.Any("userID", userID))
+		repo.logger.Error(res.Error.Error(), zap.Any("req", req))
 		return nil, res.Error
 	}
 	return goals, nil

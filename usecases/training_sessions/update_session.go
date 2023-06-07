@@ -17,11 +17,12 @@ type TrainingSessionUpdater interface {
 type TrainingSessionUpdaterImpl struct {
 	sessions repositories.TrainingSessions
 	firebase repositories.Firebase
+	goals    repositories.Goals
 	logger   *zap.Logger
 }
 
-func NewTrainingSessionUpdaterImpl(sessions repositories.TrainingSessions, firebase repositories.Firebase, logger *zap.Logger) TrainingSessionUpdaterImpl {
-	return TrainingSessionUpdaterImpl{sessions: sessions, firebase: firebase, logger: logger}
+func NewTrainingSessionUpdaterImpl(sessions repositories.TrainingSessions, firebase repositories.Firebase, goals repositories.Goals, logger *zap.Logger) TrainingSessionUpdaterImpl {
+	return TrainingSessionUpdaterImpl{sessions: sessions, firebase: firebase, goals: goals, logger: logger}
 }
 
 func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context, req tsContracts.UpdateTrainingSessionRequest) (tsContracts.UpdateTrainingSessionResponse, error) {
@@ -61,7 +62,36 @@ func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context,
 		return tsContracts.UpdateTrainingSessionResponse{}, err
 	}
 
+	// if updatedSession.Done {
+	// 	uc.goals.UpdateBySession(ctx, updatedSession, uc.logger)
+	// }
+
 	uc.firebase.FillTrainingPicture(ctx, &updatedSession.TrainingPlan)
 
 	return tsContracts.UpdateTrainingSessionResponse{Session: updatedSession}, nil
 }
+
+// func (uc *TrainingSessionUpdaterImpl) updateAthleteGoals(ctx context.Context, session models.TrainingSession, logger *zap.Logger) {
+// 	goals, err := uc.goals.GetByUserID(ctx, session.UserID)
+// 	if err != nil {
+// 		logger.Error("Unable to obtain user goals while trying to update them", zap.Error(err), zap.Any("trainingSession", session))
+// 		return
+// 	}
+// 	for _, goal := range goals {
+// 		if goal.GoalType == "step count" {
+// 			goal.GoalValue += session.StepCount
+// 		}
+// 		if goal.GoalType == "minutes count" {
+// 			goal.GoalValue += (session.SecondsCount) / 60
+// 		}
+// 		if goal.GoalType == "sessions count" {
+// 			if goal.GoalSubtype == strings.ToLower(session.TrainingPlan.Difficulty) {
+// 				goal.GoalValue += 1
+// 			}
+// 			if session.TrainingPlan.Tags.Contains(goal.GoalSubtype) {
+// 				goal.GoalValue += 1
+// 			}
+// 		}
+// 		uc.goals.Update(ctx)
+// 	}
+// }

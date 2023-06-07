@@ -28,6 +28,6 @@ func (uc *GoalGetterImpl) GetGoalByID(ctx context.Context, goalID uint) (models.
 }
 
 func (uc *GoalGetterImpl) GetGoals(ctx context.Context, req goals.GetGoalsRequest) (goals.GetGoalsResponse, error) {
-	res, err := uc.goals.GetByUserID(ctx, req.UserID)
+	res, err := uc.goals.Get(ctx, req)
 	return goals.GetGoalsResponse{Goals: res}, err
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"strings"
-	"time"
 
 	"github.com/fiufit/trainings/contracts"
 	gContracts "github.com/fiufit/trainings/contracts/goals"
@@ -18,7 +17,7 @@ type Goals interface {
 	GetByID(ctx context.Context, goalID uint) (models.Goal, error)
 	Get(ctx context.Context, req gContracts.GetGoalsRequest) ([]models.Goal, error)
 	Update(ctx context.Context, goal models.Goal) (models.Goal, error)
-	UpdateBySession(ctx context.Context, session models.TrainingSession) error
+	UpdateBySession(ctx context.Context, session models.TrainingSession) ([]models.Goal, error)
 	Delete(ctx context.Context, goalID uint) error
 }
 
@@ -97,8 +96,9 @@ func (repo GoalsRepository) Update(ctx context.Context, goal models.Goal) (model
 	return goal, nil
 }
 
-func (repo GoalsRepository) UpdateBySession(ctx context.Context, session models.TrainingSession) error {
-	db := repo.db.WithContext(ctx).Where("", time.Now(), session.UserID)
+func (repo GoalsRepository) UpdateBySession(ctx context.Context, session models.TrainingSession) ([]models.Goal, error) {
+	db := repo.db.WithContext(ctx)
+	var modifGoals []models.Goal
 
 	tagStrings := make([]string, len(session.TrainingPlan.Tags))
 	for i, tag := range session.TrainingPlan.Tags {
@@ -106,48 +106,55 @@ func (repo GoalsRepository) UpdateBySession(ctx context.Context, session models.
 	}
 
 	if session.TrainingPlan.Difficulty != "" && session.TrainingPlan.Tags != nil {
-
-		res := db.Exec("UPDATE goals SET goal_value_progress = goal_value_progress + 1 WHERE goal_type = 'sessions count' "+
-			"AND (goal_subtype = ? OR goal_subtype IN (?)) AND deadline > NOW() AND user_id = ? AND goal_value > goal_value_progress",
+		var sessionGoals []models.Goal
+		res := db.Raw("UPDATE goals SET goal_value_progress = goal_value_progress + 1 WHERE goal_type = 'sessions count' "+
+			"AND (goal_subtype = ? OR goal_subtype IN (?)) AND deadline > NOW() AND user_id = ? AND goal_value > goal_value_progress RETURNING *",
 			strings.ToLower(session.TrainingPlan.Difficulty),
 			tagStrings,
 			session.UserID,
-		)
+		).Scan(&sessionGoals)
 
 		if res.Error != nil {
 			repo.logger.Error("Unable to update sessions count goals", zap.Error(res.Error))
-			return res.Error
+			return nil, res.Error
 		}
+
+		modifGoals = append(modifGoals, sessionGoals...)
 	}
 
 	if session.SecondsCount > 0 {
-
-		res := db.Exec("UPDATE goals SET goal_value_progress = LEAST(goal_value_progress + ?, goal_value) WHERE goal_type = 'minutes count' "+
-			"AND deadline > NOW() AND user_id = ? AND goal_value > goal_value_progress",
+		var minutesGoals []models.Goal
+		res := db.Raw("UPDATE goals SET goal_value_progress = LEAST(goal_value_progress + ?, goal_value) WHERE goal_type = 'minutes count' "+
+			"AND deadline > NOW() AND user_id = ? AND goal_value > goal_value_progress RETURNING *",
 			int(session.SecondsCount/60),
 			session.UserID,
-		)
+		).Scan(&minutesGoals)
 
 		if res.Error != nil {
 			repo.logger.Error("Unable to update minutes count goals", zap.Error(res.Error))
-			return res.Error
+			return nil, res.Error
 		}
+
+		modifGoals = append(modifGoals, minutesGoals...)
 	}
 
 	if session.StepCount > 0 {
-		res := db.Exec("UPDATE goals SET goal_value_progress = LEAST(goal_value_progress + ?, goal_value) WHERE goal_type = 'step count' "+
-			"AND deadline > NOW() AND user_id = ? AND goal_value > goal_value_progress",
+		var stepsGoals []models.Goal
+		res := db.Raw("UPDATE goals SET goal_value_progress = LEAST(goal_value_progress + ?, goal_value) WHERE goal_type = 'step count' "+
+			"AND deadline > NOW() AND user_id = ? AND goal_value > goal_value_progress RETURNING *",
 			session.StepCount,
 			session.UserID,
-		)
+		).Scan(&stepsGoals)
 
 		if res.Error != nil {
 			repo.logger.Error("Unable to update step count goals", zap.Error(res.Error))
-			return res.Error
+			return nil, res.Error
 		}
+
+		modifGoals = append(modifGoals, stepsGoals...)
 	}
 
-	return nil
+	return modifGoals, nil
 
 }
 

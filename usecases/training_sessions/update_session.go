@@ -15,14 +15,15 @@ type TrainingSessionUpdater interface {
 }
 
 type TrainingSessionUpdaterImpl struct {
-	sessions repositories.TrainingSessions
-	firebase repositories.Firebase
-	goals    repositories.Goals
-	logger   *zap.Logger
+	sessions      repositories.TrainingSessions
+	firebase      repositories.Firebase
+	goals         repositories.Goals
+	notifications repositories.Notifications
+	logger        *zap.Logger
 }
 
-func NewTrainingSessionUpdaterImpl(sessions repositories.TrainingSessions, firebase repositories.Firebase, goals repositories.Goals, logger *zap.Logger) TrainingSessionUpdaterImpl {
-	return TrainingSessionUpdaterImpl{sessions: sessions, firebase: firebase, goals: goals, logger: logger}
+func NewTrainingSessionUpdaterImpl(sessions repositories.TrainingSessions, firebase repositories.Firebase, goals repositories.Goals, notifications repositories.Notifications, logger *zap.Logger) TrainingSessionUpdaterImpl {
+	return TrainingSessionUpdaterImpl{sessions: sessions, firebase: firebase, goals: goals, notifications: notifications, logger: logger}
 }
 
 func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context, req tsContracts.UpdateTrainingSessionRequest) (tsContracts.UpdateTrainingSessionResponse, error) {
@@ -63,9 +64,19 @@ func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context,
 	}
 
 	if updatedSession.Done {
-		err = uc.goals.UpdateBySession(ctx, updatedSession)
+		goals, err := uc.goals.UpdateBySession(ctx, updatedSession)
 		if err != nil {
 			uc.logger.Error("Unable to update user goal", zap.Error(err))
+		} else {
+			for _, goal := range goals {
+				if goal.GoalValue <= goal.GoalValueProgress {
+					err = uc.notifications.SendGoalNotification(ctx, goal)
+					if err != nil {
+						uc.logger.Error("Unable to send notification", zap.Error(err))
+					}
+				}
+
+			}
 		}
 	}
 

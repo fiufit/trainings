@@ -75,6 +75,7 @@ func NewServer() *Server {
 
 	logger, _ := zap.NewDevelopment()
 	usersUrl := os.Getenv("USERS_SERVICE_URL")
+	notifUrl := os.Getenv("NOTIFICATIONS_SERVICE_URL")
 
 	sdkJson, err := base64.StdEncoding.DecodeString(os.Getenv("FIREBASE_B64_SDK_JSON"))
 	if err != nil {
@@ -89,6 +90,7 @@ func NewServer() *Server {
 	trainingSessionRepo := repositories.NewTrainingSessionsRepository(db, logger)
 	reviewRepo := repositories.NewReviewRepository(db, logger)
 	goalRepo := repositories.NewGoalsRepository(db, logger)
+	notificationRepo := repositories.NewNotificationRepository(notifUrl, logger, "v1")
 	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
 	firebaseRepo, err := repositories.NewFirebaseRepository(logger, sdkJson, bucketName)
 	if err != nil {
@@ -113,7 +115,7 @@ func NewServer() *Server {
 
 	createTrainingSessionUc := training_sessions.NewTrainingSessionCreatorImpl(userRepo, trainingRepo, trainingSessionRepo, logger)
 	getTrainingSessionUc := training_sessions.NewTrainingSessionGetterImpl(trainingSessionRepo, firebaseRepo, logger)
-	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, goalRepo, logger)
+	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, goalRepo, notificationRepo, logger)
 
 	createGoalUc := goals.NewGoalCreatorImpl(userRepo, goalRepo, logger)
 	getGoalUc := goals.NewGoalGetterImpl(goalRepo, logger)

@@ -7,7 +7,7 @@ import (
 )
 
 type GetGoalsRequest struct {
-	UserID      string    `form:"user_id"`
+	UserID      string    `form:"user_id" binding:"required"`
 	GoalType    string    `form:"type"`
 	GoalSubtype string    `form:"subtype"`
 	Deadline    time.Time `form:"deadline"`

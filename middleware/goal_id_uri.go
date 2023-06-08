@@ -17,6 +17,7 @@ func BindGoalIDFromUri() gin.HandlerFunc {
 		err := ctx.ShouldBindUri(&g)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
+			ctx.Abort()
 			return
 		}
 		ctx.Set("goalID", g.GoalID)

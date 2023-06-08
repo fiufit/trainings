@@ -17,6 +17,7 @@ func BindExerciseIDFromUri() gin.HandlerFunc {
 		err := ctx.ShouldBindUri(&e)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
+			ctx.Abort()
 			return
 		}
 		ctx.Set("exerciseID", e.ExerciseID)

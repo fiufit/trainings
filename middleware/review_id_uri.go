@@ -17,6 +17,7 @@ func BindReviewIDFromUri() gin.HandlerFunc {
 		err := ctx.ShouldBindUri(&r)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
+			ctx.Abort()
 			return
 		}
 		ctx.Set("reviewID", r.ReviewID)

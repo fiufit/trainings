@@ -7,19 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type TrainingSessionID struct {
-	TrainingSessionID uint `uri:"trainingSessionID" binding:"required"`
+type GoalID struct {
+	GoalID uint `uri:"goalID" binding:"required"`
 }
 
-func BindTrainingSessionIDFromUri() gin.HandlerFunc {
+func BindGoalIDFromUri() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var ts TrainingSessionID
-		err := ctx.ShouldBindUri(&ts)
+		var g GoalID
+		err := ctx.ShouldBindUri(&g)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, contracts.FormatErrResponse(contracts.ErrBadRequest))
 			ctx.Abort()
 			return
 		}
-		ctx.Set("trainingSessionID", ts.TrainingSessionID)
+		ctx.Set("goalID", g.GoalID)
 	}
 }

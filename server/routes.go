@@ -11,12 +11,36 @@ func (s *Server) InitRoutes() {
 	exerciseRouter := trainingRouter.Group("/:trainingID/exercises")
 	reviewRouter := trainingRouter.Group("/:trainingID/reviews")
 	sessionRouter := baseRouter.Group("/training_sessions")
+	goalsRouter := baseRouter.Group("/goals")
 
 	s.InitTrainingRoutes(trainingRouter)
 	s.InitExerciseRoutes(exerciseRouter)
 	s.InitReviewRoutes(reviewRouter)
 	s.InitTrainingSessionRoutes(sessionRouter)
+	s.InitGoalsRoutes(goalsRouter)
 
+}
+
+func (s *Server) InitGoalsRoutes(router *gin.RouterGroup) {
+	router.POST("", middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.createGoal.Handle(),
+	}))
+
+	router.GET("", middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getGoals.Handle(),
+	}))
+
+	router.GET("/:goalID", middleware.BindGoalIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getGoalByID.Handle(),
+	}))
+
+	router.PATCH("/:goalID", middleware.BindGoalIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.updateGoal.Handle(),
+	}))
+
+	router.DELETE("/:goalID", middleware.BindGoalIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.deleteGoal.Handle(),
+	}))
 }
 
 func (s *Server) InitTrainingSessionRoutes(router *gin.RouterGroup) {

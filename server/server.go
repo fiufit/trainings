@@ -7,12 +7,14 @@ import (
 
 	"github.com/fiufit/trainings/database"
 	exerciseHandlers "github.com/fiufit/trainings/handlers/exercises"
+	goalsHandlers "github.com/fiufit/trainings/handlers/goals"
 	reviewHandlers "github.com/fiufit/trainings/handlers/reviews"
 	trainingSessionHandlers "github.com/fiufit/trainings/handlers/training_sessions"
 	trainingHandlers "github.com/fiufit/trainings/handlers/trainings"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories"
 	"github.com/fiufit/trainings/usecases/exercises"
+	"github.com/fiufit/trainings/usecases/goals"
 	"github.com/fiufit/trainings/usecases/reviews"
 	"github.com/fiufit/trainings/usecases/training_sessions"
 	"github.com/fiufit/trainings/usecases/trainings"
@@ -39,6 +41,11 @@ type Server struct {
 	updateTrainingSession  trainingSessionHandlers.UpdateTrainingSessions
 	getTrainingSessions    trainingSessionHandlers.GetTrainingSessions
 	getTrainingSessionByID trainingSessionHandlers.GetTrainingSessionByID
+	createGoal             goalsHandlers.CreateGoal
+	getGoalByID            goalsHandlers.GetGoalByID
+	getGoals               goalsHandlers.GetGoals
+	updateGoal             goalsHandlers.UpdateGoal
+	deleteGoal             goalsHandlers.DeleteGoal
 }
 
 func (s *Server) Run() {
@@ -60,6 +67,7 @@ func NewServer() *Server {
 		&models.Tag{},
 		&models.TrainingSession{},
 		&models.ExerciseSession{},
+		&models.Goal{},
 	)
 	if err != nil {
 		panic(err)
@@ -67,6 +75,7 @@ func NewServer() *Server {
 
 	logger, _ := zap.NewDevelopment()
 	usersUrl := os.Getenv("USERS_SERVICE_URL")
+	notifUrl := os.Getenv("NOTIFICATIONS_SERVICE_URL")
 
 	sdkJson, err := base64.StdEncoding.DecodeString(os.Getenv("FIREBASE_B64_SDK_JSON"))
 	if err != nil {
@@ -80,6 +89,8 @@ func NewServer() *Server {
 	exerciseRepo := repositories.NewExerciseRepository(db, logger)
 	trainingSessionRepo := repositories.NewTrainingSessionsRepository(db, logger)
 	reviewRepo := repositories.NewReviewRepository(db, logger)
+	goalRepo := repositories.NewGoalsRepository(db, logger)
+	notificationRepo := repositories.NewNotificationRepository(notifUrl, logger, "v1")
 	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
 	firebaseRepo, err := repositories.NewFirebaseRepository(logger, sdkJson, bucketName)
 	if err != nil {
@@ -104,7 +115,12 @@ func NewServer() *Server {
 
 	createTrainingSessionUc := training_sessions.NewTrainingSessionCreatorImpl(userRepo, trainingRepo, trainingSessionRepo, logger)
 	getTrainingSessionUc := training_sessions.NewTrainingSessionGetterImpl(trainingSessionRepo, firebaseRepo, logger)
-	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, logger)
+	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, goalRepo, notificationRepo, logger)
+
+	createGoalUc := goals.NewGoalCreatorImpl(userRepo, goalRepo, logger)
+	getGoalUc := goals.NewGoalGetterImpl(goalRepo, logger)
+	updateGoalUc := goals.NewGoalUpdaterImpl(goalRepo, logger)
+	deleteGoalUc := goals.NewGoalDeleterImpl(goalRepo, logger)
 
 	// HANDLERS
 	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)
@@ -128,6 +144,12 @@ func NewServer() *Server {
 	getTrainingSessionByID := trainingSessionHandlers.NewGetTrainingSessionByID(&getTrainingSessionUc)
 	updateTrainingSession := trainingSessionHandlers.NewUpdateTrainingSessions(&updateTrainingSessionUc)
 
+	createGoal := goalsHandlers.NewCreateGoal(&createGoalUc, logger)
+	getGoalByID := goalsHandlers.NewGetGoalByID(&getGoalUc, logger)
+	getGoals := goalsHandlers.NewGetGoals(&getGoalUc, logger)
+	updateGoal := goalsHandlers.NewUpdateGoal(&updateGoalUc, logger)
+	deleteGoal := goalsHandlers.NewDeleteGoal(&deleteGoalUc, logger)
+
 	return &Server{
 		router:                 gin.Default(),
 		createTraining:         createTraining,
@@ -147,5 +169,10 @@ func NewServer() *Server {
 		getTrainingSessions:    getTrainingSessions,
 		getTrainingSessionByID: getTrainingSessionByID,
 		updateTrainingSession:  updateTrainingSession,
+		createGoal:             createGoal,
+		getGoalByID:            getGoalByID,
+		getGoals:               getGoals,
+		updateGoal:             updateGoal,
+		deleteGoal:             deleteGoal,
 	}
 }

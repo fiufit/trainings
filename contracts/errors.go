@@ -24,4 +24,6 @@ var (
 	ErrInvalidGoalType                = errors.New("invalid goal type")
 	ErrInvalidGoalSubtype             = errors.New("invalid goal subtype")
 	ErrGoalNotFound                   = errors.New("goal not found")
+	ErrAlreadyLiked                   = errors.New("user already added training plan to favorites")
+	ErrNotLiked                       = errors.New("user didn't add training plan to favorites")
 )

@@ -21,6 +21,9 @@ type TrainingPlans interface {
 	GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
 	UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error)
 	DeleteTrainingPlan(ctx context.Context, trainingID uint) error
+	AddToFavorite(ctx context.Context, userID string, trainingID uint, trainingVersion uint) error
+	RemoveFromFavorite(ctx context.Context, userID string, trainingID uint, trainingVersion uint) error
+	GetFavoriteTrainings(ctx context.Context, req trainings.GetFavoritesRequest) (trainings.GetTrainingsResponse, error)
 }
 
 type TrainingRepository struct {
@@ -178,7 +181,7 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 
 func (repo TrainingRepository) DeleteTrainingPlan(ctx context.Context, trainingID uint) error {
 	db := repo.db.WithContext(ctx)
-	result := db.Select("Exercises", "Reviews").Delete(&models.TrainingPlan{ID: trainingID})
+	result := db.Select("Exercises", "Reviews", "Favorites").Delete(&models.TrainingPlan{ID: trainingID})
 	if result.Error != nil {
 		repo.logger.Error("Unable to delete training plan", zap.Error(result.Error))
 		return result.Error
@@ -187,6 +190,46 @@ func (repo TrainingRepository) DeleteTrainingPlan(ctx context.Context, trainingI
 		return contracts.ErrTrainingPlanNotFound
 	}
 	return nil
+}
+
+func (repo TrainingRepository) AddToFavorite(ctx context.Context, userID string, trainingID uint, trainingVersion uint) error {
+	db := repo.db.WithContext(ctx)
+	result := db.Create(&models.Favorite{UserID: userID, TrainingPlanID: trainingID, TrainingPlanVersion: trainingVersion})
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
+			return contracts.ErrAlreadyLiked
+		}
+		repo.logger.Error("Unable to add training plan to favorites", zap.Error(result.Error))
+		return result.Error
+	}
+	return nil
+}
+
+func (repo TrainingRepository) RemoveFromFavorite(ctx context.Context, userID string, trainingID uint, trainingVersion uint) error {
+	db := repo.db.WithContext(ctx)
+	result := db.Where("user_id = ? AND training_plan_id = ?", userID, trainingID).Delete(&models.Favorite{})
+	if result.Error != nil {
+		repo.logger.Error("Unable to remove training plan from favorites", zap.Error(result.Error))
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return contracts.ErrNotLiked
+	}
+	return nil
+}
+
+func (repo TrainingRepository) GetFavoriteTrainings(ctx context.Context, req trainings.GetFavoritesRequest) (trainings.GetTrainingsResponse, error) {
+	var res []models.TrainingPlan
+	db := repo.db.WithContext(ctx)
+	result := db.Joins("JOIN favorites ON training_plans.id = favorites.training_plan_id").
+		Where("favorites.user_id = ?", req.UserID).
+		Scopes(database.Paginate(&res, &req.Pagination, db)).
+		Find(&res)
+	if result.Error != nil {
+		repo.logger.Error("Unable to get favorite trainings", zap.Error(result.Error))
+		return trainings.GetTrainingsResponse{}, result.Error
+	}
+	return trainings.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
 }
 
 type Result struct {

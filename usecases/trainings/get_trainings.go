@@ -69,6 +69,10 @@ func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, trainingID ui
 }
 
 func (uc *TrainingGetterImpl) GetFavoritePlans(ctx context.Context, req trainings.GetFavoritesRequest) (trainings.GetTrainingsResponse, error) {
+	_, err := uc.users.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		return trainings.GetTrainingsResponse{}, err
+	}
 	res, err := uc.trainings.GetFavoriteTrainings(ctx, req)
 	if err != nil {
 		return res, err

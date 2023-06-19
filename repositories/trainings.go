@@ -56,7 +56,8 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 		Preload("Exercises").
 		Preload("Reviews").
 		Preload("Tags").
-		Select("training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score").
+		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
+					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
 		First(&training, "id = ?", trainingID)
 
 	if result.Error != nil {
@@ -71,6 +72,7 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 	result.Scan(&resultStruct)
 
 	training.MeanScore = resultStruct.MeanScore
+	training.FavoritesCount = resultStruct.FavoritesCount
 
 	return training, nil
 }
@@ -82,7 +84,8 @@ func (repo TrainingRepository) GetTrainingByIDAndVersion(ctx context.Context, tr
 		Preload("Exercises").
 		Preload("Reviews").
 		Preload("Tags").
-		Select("training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score").
+		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
+					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
 		First(&training, "id = ? AND version = ?", trainingID, version)
 
 	if result.Error != nil {
@@ -97,6 +100,7 @@ func (repo TrainingRepository) GetTrainingByIDAndVersion(ctx context.Context, tr
 	result.Scan(&resultStruct)
 
 	training.MeanScore = resultStruct.MeanScore
+	training.FavoritesCount = resultStruct.FavoritesCount
 
 	return training, nil
 }
@@ -130,7 +134,8 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 			"training_plan_tags.training_plan_version = training_plans.version").Distinct().Where("training_plan_tags.tag_name IN (?)", req.TagStrings)
 	}
 
-	db = db.Select("training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score").
+	db = db.Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
+					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
 		Order("mean_score DESC")
 
 	result := db.
@@ -150,6 +155,7 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 
 	for i := range res {
 		res[i].MeanScore = results[i].MeanScore
+		res[i].FavoritesCount = results[i].FavoritesCount
 	}
 
 	return trainings.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
@@ -163,7 +169,10 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 		return models.TrainingPlan{}, err
 	}
 
+	print(oldPlan.FavoritesCount)
 	training.Version = oldPlan.Version + 1
+	training.MeanScore = oldPlan.MeanScore
+	training.FavoritesCount = oldPlan.FavoritesCount
 
 	deleteOldResult := db.Select("Exercises").Delete(&models.TrainingPlan{ID: oldPlan.ID, Version: oldPlan.Version})
 	if deleteOldResult.Error != nil {
@@ -224,15 +233,25 @@ func (repo TrainingRepository) GetFavoriteTrainings(ctx context.Context, req tra
 	result := db.Joins("JOIN favorites ON training_plans.id = favorites.training_plan_id").
 		Where("favorites.user_id = ?", req.UserID).
 		Scopes(database.Paginate(&res, &req.Pagination, db)).
+		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
+					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
 		Find(&res)
 	if result.Error != nil {
 		repo.logger.Error("Unable to get favorite trainings", zap.Error(result.Error))
 		return trainings.GetTrainingsResponse{}, result.Error
+	}
+	var results []Result
+	result.Scan(&results)
+
+	for i := range res {
+		res[i].MeanScore = results[i].MeanScore
+		res[i].FavoritesCount = results[i].FavoritesCount
 	}
 	return trainings.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
 }
 
 type Result struct {
 	models.TrainingPlan
-	MeanScore float32
+	MeanScore      float32
+	FavoritesCount uint
 }

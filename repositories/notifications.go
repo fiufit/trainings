@@ -36,7 +36,12 @@ func (repo NotificationRepository) SendGoalNotification(ctx context.Context, goa
 		Body:     fmt.Sprintf("Goal %s completed", goal.Title),
 		Subtitle: "Congrats, you have completed your goal!",
 		Sound:    "default",
-		Data:     map[string]interface{}{},
+		Data: map[string]interface{}{
+			"redirectTo": "Profile",
+			"params": map[string]interface{}{
+				"forceRefresh": true,
+			},
+		},
 	}
 	jsonBody, err := json.Marshal(body)
 	if err != nil {

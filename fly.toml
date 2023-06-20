@@ -27,7 +27,7 @@ processes = []
 
 [env]
   SERVICE_PORT = "8888"
-  DB_HOST = "db.yohuhdcgcaxsccbfyqje.supabase.co"
+  DB_HOST = "db.sayiglkqdegrbuuawnju.supabase.co"
   DB_NAME = "postgres"
   DB_PORT = 5432
   DB_USER = "postgres"

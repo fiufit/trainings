@@ -169,7 +169,6 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 		return models.TrainingPlan{}, err
 	}
 
-	print(oldPlan.FavoritesCount)
 	training.Version = oldPlan.Version + 1
 	training.MeanScore = oldPlan.MeanScore
 	training.FavoritesCount = oldPlan.FavoritesCount

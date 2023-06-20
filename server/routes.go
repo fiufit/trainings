@@ -77,6 +77,18 @@ func (s *Server) InitTrainingRoutes(router *gin.RouterGroup) {
 	router.DELETE("/:trainingID", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
 		"v1": s.deleteTraining.Handle(),
 	}))
+
+	router.POST("/:trainingID/favorites", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.addFavorite.Handle(),
+	}))
+
+	router.DELETE("/:trainingID/favorites", middleware.BindTrainingIDFromUri(), middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.removeFavorite.Handle(),
+	}))
+
+	router.GET("/favorites", middleware.HandleByVersion(middleware.VersionHandlers{
+		"v1": s.getFavorites.Handle(),
+	}))
 }
 
 func (s *Server) InitExerciseRoutes(router *gin.RouterGroup) {

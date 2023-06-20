@@ -46,6 +46,9 @@ type Server struct {
 	getGoals               goalsHandlers.GetGoals
 	updateGoal             goalsHandlers.UpdateGoal
 	deleteGoal             goalsHandlers.DeleteGoal
+	addFavorite            trainingHandlers.AddFavorite
+	removeFavorite         trainingHandlers.RemoveFavorite
+	getFavorites           trainingHandlers.GetFavorites
 }
 
 func (s *Server) Run() {
@@ -68,6 +71,7 @@ func NewServer() *Server {
 		&models.TrainingSession{},
 		&models.ExerciseSession{},
 		&models.Goal{},
+		&models.Favorite{},
 	)
 	if err != nil {
 		panic(err)
@@ -122,6 +126,8 @@ func NewServer() *Server {
 	updateGoalUc := goals.NewGoalUpdaterImpl(goalRepo, logger)
 	deleteGoalUc := goals.NewGoalDeleterImpl(goalRepo, logger)
 
+	favoriteUc := trainings.NewFavoriteAdderImpl(trainingRepo, logger)
+
 	// HANDLERS
 	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)
 	getTrainings := trainingHandlers.NewGetTrainings(&getTrainingUc, logger)
@@ -150,6 +156,10 @@ func NewServer() *Server {
 	updateGoal := goalsHandlers.NewUpdateGoal(&updateGoalUc, logger)
 	deleteGoal := goalsHandlers.NewDeleteGoal(&deleteGoalUc, logger)
 
+	addFavorite := trainingHandlers.NewAddFavorite(&favoriteUc, logger)
+	removeFavorite := trainingHandlers.NewRemoveFavorite(&favoriteUc, logger)
+	getFavorites := trainingHandlers.NewGetFavorites(&getTrainingUc, logger)
+
 	return &Server{
 		router:                 gin.Default(),
 		createTraining:         createTraining,
@@ -174,5 +184,8 @@ func NewServer() *Server {
 		getGoals:               getGoals,
 		updateGoal:             updateGoal,
 		deleteGoal:             deleteGoal,
+		addFavorite:            addFavorite,
+		removeFavorite:         removeFavorite,
+		getFavorites:           getFavorites,
 	}
 }

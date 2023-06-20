@@ -13,6 +13,7 @@ type TrainingGetter interface {
 	GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
 	GetTrainingByID(ctx context.Context, trainingID uint) (models.TrainingPlan, error)
 	GetRecommendedPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error)
+	GetFavoritePlans(ctx context.Context, req trainings.GetFavoritesRequest) (trainings.GetTrainingsResponse, error)
 }
 
 type TrainingGetterImpl struct {
@@ -65,4 +66,19 @@ func (uc *TrainingGetterImpl) GetTrainingByID(ctx context.Context, trainingID ui
 	}
 	uc.firebase.FillTrainingPicture(ctx, &training)
 	return training, nil
+}
+
+func (uc *TrainingGetterImpl) GetFavoritePlans(ctx context.Context, req trainings.GetFavoritesRequest) (trainings.GetTrainingsResponse, error) {
+	_, err := uc.users.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		return trainings.GetTrainingsResponse{}, err
+	}
+	res, err := uc.trainings.GetFavoriteTrainings(ctx, req)
+	if err != nil {
+		return res, err
+	}
+	for i := range res.TrainingPlans {
+		uc.firebase.FillTrainingPicture(ctx, &res.TrainingPlans[i])
+	}
+	return res, nil
 }

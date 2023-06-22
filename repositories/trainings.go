@@ -232,6 +232,9 @@ func (repo TrainingRepository) GetFavoriteTrainings(ctx context.Context, req tra
 	result := db.Joins("JOIN favorites ON training_plans.id = favorites.training_plan_id").
 		Where("favorites.user_id = ?", req.UserID).
 		Scopes(database.Paginate(&res, &req.Pagination, db)).
+		Preload("Exercises").
+		Preload("Reviews").
+		Preload("Tags").
 		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
 					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
 		Find(&res)

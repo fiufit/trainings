@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/fiufit/trainings/contracts"
+	"github.com/fiufit/trainings/contracts/metrics"
 	tsContracts "github.com/fiufit/trainings/contracts/training_sessions"
 	"github.com/fiufit/trainings/repositories"
 	"go.uber.org/zap"
@@ -19,11 +20,12 @@ type TrainingSessionUpdaterImpl struct {
 	firebase      repositories.Firebase
 	goals         repositories.Goals
 	notifications repositories.Notifications
+	metrics       repositories.Metrics
 	logger        *zap.Logger
 }
 
-func NewTrainingSessionUpdaterImpl(sessions repositories.TrainingSessions, firebase repositories.Firebase, goals repositories.Goals, notifications repositories.Notifications, logger *zap.Logger) TrainingSessionUpdaterImpl {
-	return TrainingSessionUpdaterImpl{sessions: sessions, firebase: firebase, goals: goals, notifications: notifications, logger: logger}
+func NewTrainingSessionUpdaterImpl(sessions repositories.TrainingSessions, firebase repositories.Firebase, goals repositories.Goals, notifications repositories.Notifications, metrics repositories.Metrics, logger *zap.Logger) TrainingSessionUpdaterImpl {
+	return TrainingSessionUpdaterImpl{sessions: sessions, firebase: firebase, goals: goals, notifications: notifications, metrics: metrics, logger: logger}
 }
 
 func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context, req tsContracts.UpdateTrainingSessionRequest) (tsContracts.UpdateTrainingSessionResponse, error) {
@@ -64,6 +66,14 @@ func (uc *TrainingSessionUpdaterImpl) UpdateTrainingSession(ctx context.Context,
 	}
 
 	if updatedSession.Done {
+
+		sessionDoneMetric := metrics.CreateMetricRequest{
+			MetricType: "training_session_finished",
+			SubType:    ts.UserID,
+		}
+
+		uc.metrics.Create(ctx, sessionDoneMetric)
+
 		goals, err := uc.goals.UpdateBySession(ctx, updatedSession)
 		if err != nil {
 			uc.logger.Error("Unable to update user goal", zap.Error(err))

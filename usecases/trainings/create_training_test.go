@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fiufit/trainings/contracts/metrics"
 	"github.com/fiufit/trainings/contracts/trainings"
 	"github.com/fiufit/trainings/models"
 	"github.com/fiufit/trainings/repositories/mocks"
@@ -35,12 +36,17 @@ func TestCreateTrainingOk(t *testing.T) {
 
 	trainingRepo := new(mocks.TrainingPlans)
 	userRepo := new(mocks.Users)
+	metricsRepo := new(mocks.Metrics)
 
 	training := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(training, nil)
-	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{}, nil)
+	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{ID: "testUserID"}, nil)
+	metricsRepo.On("Create", ctx, metrics.CreateMetricRequest{
+		MetricType: "new_training",
+		SubType:    "testUserID",
+	})
 
-	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, zaptest.NewLogger(t))
+	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, metricsRepo, zaptest.NewLogger(t))
 	res, err := trainingUc.CreateTraining(ctx, req)
 
 	assert.NoError(t, err)
@@ -60,12 +66,17 @@ func TestCreateTrainingError(t *testing.T) {
 	}
 	trainingRepo := new(mocks.TrainingPlans)
 	userRepo := new(mocks.Users)
+	metricsRepo := new(mocks.Metrics)
 
 	training := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(models.TrainingPlan{}, errors.New("repo error"))
-	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{}, nil)
+	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{ID: "testUserID"}, nil)
+	metricsRepo.On("Create", ctx, metrics.CreateMetricRequest{
+		MetricType: "new_training",
+		SubType:    "testUserID",
+	})
 
-	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, zaptest.NewLogger(t))
+	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, metricsRepo, zaptest.NewLogger(t))
 	res, err := trainingUc.CreateTraining(ctx, req)
 
 	assert.Equal(t, res.TrainingPlan, models.TrainingPlan{})

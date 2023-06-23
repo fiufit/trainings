@@ -80,6 +80,7 @@ func NewServer() *Server {
 	logger, _ := zap.NewDevelopment()
 	usersUrl := os.Getenv("USERS_SERVICE_URL")
 	notifUrl := os.Getenv("NOTIFICATIONS_SERVICE_URL")
+	metricsUrl := os.Getenv("METRICS_SERVICE_URL")
 
 	sdkJson, err := base64.StdEncoding.DecodeString(os.Getenv("FIREBASE_B64_SDK_JSON"))
 	if err != nil {
@@ -96,13 +97,14 @@ func NewServer() *Server {
 	goalRepo := repositories.NewGoalsRepository(db, logger)
 	notificationRepo := repositories.NewNotificationRepository(notifUrl, logger, "v1")
 	userRepo := repositories.NewUserRepository(usersUrl, logger, "v1")
+	metricsRepo := repositories.NewMetricsRepository(metricsUrl, "v1", logger)
 	firebaseRepo, err := repositories.NewFirebaseRepository(logger, sdkJson, bucketName)
 	if err != nil {
 		panic(err)
 	}
 
 	// USECASES
-	createTrainingUc := trainings.NewTrainingCreatorImpl(trainingRepo, userRepo, logger)
+	createTrainingUc := trainings.NewTrainingCreatorImpl(trainingRepo, userRepo, metricsRepo, logger)
 	getTrainingUc := trainings.NewTrainingGetterImpl(trainingRepo, firebaseRepo, userRepo, logger)
 	updateTrainingUc := trainings.NewTrainingUpdaterImpl(trainingRepo, firebaseRepo, logger)
 	deleteTrainingUc := trainings.NewTrainingDeleterImpl(trainingRepo, logger)
@@ -119,14 +121,14 @@ func NewServer() *Server {
 
 	createTrainingSessionUc := training_sessions.NewTrainingSessionCreatorImpl(userRepo, trainingRepo, trainingSessionRepo, logger)
 	getTrainingSessionUc := training_sessions.NewTrainingSessionGetterImpl(trainingSessionRepo, firebaseRepo, logger)
-	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, goalRepo, notificationRepo, logger)
+	updateTrainingSessionUc := training_sessions.NewTrainingSessionUpdaterImpl(trainingSessionRepo, firebaseRepo, goalRepo, notificationRepo, metricsRepo, logger)
 
 	createGoalUc := goals.NewGoalCreatorImpl(userRepo, goalRepo, logger)
 	getGoalUc := goals.NewGoalGetterImpl(goalRepo, logger)
 	updateGoalUc := goals.NewGoalUpdaterImpl(goalRepo, logger)
 	deleteGoalUc := goals.NewGoalDeleterImpl(goalRepo, logger)
 
-	favoriteUc := trainings.NewFavoriteAdderImpl(trainingRepo, logger)
+	favoriteUc := trainings.NewFavoriteAdderImpl(trainingRepo, metricsRepo, logger)
 
 	// HANDLERS
 	createTraining := trainingHandlers.NewCreateTraining(&createTrainingUc, logger)

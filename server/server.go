@@ -49,6 +49,8 @@ type Server struct {
 	addFavorite            trainingHandlers.AddFavorite
 	removeFavorite         trainingHandlers.RemoveFavorite
 	getFavorites           trainingHandlers.GetFavorites
+	enableTraining         trainingHandlers.EnableTraining
+	disableTraining        trainingHandlers.DisableTraining
 }
 
 func (s *Server) Run() {
@@ -162,6 +164,9 @@ func NewServer() *Server {
 	removeFavorite := trainingHandlers.NewRemoveFavorite(&favoriteUc, logger)
 	getFavorites := trainingHandlers.NewGetFavorites(&getTrainingUc, logger)
 
+	enableTraining := trainingHandlers.NewEnableTraining(&updateTrainingUc, logger)
+	disableTraining := trainingHandlers.NewDisableTraining(&updateTrainingUc, logger)
+
 	return &Server{
 		router:                 gin.Default(),
 		createTraining:         createTraining,
@@ -189,5 +194,7 @@ func NewServer() *Server {
 		addFavorite:            addFavorite,
 		removeFavorite:         removeFavorite,
 		getFavorites:           getFavorites,
+		enableTraining:         enableTraining,
+		disableTraining:        disableTraining,
 	}
 }

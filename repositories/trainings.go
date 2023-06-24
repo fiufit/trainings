@@ -24,6 +24,7 @@ type TrainingPlans interface {
 	AddToFavorite(ctx context.Context, userID string, trainingID uint, trainingVersion uint) error
 	RemoveFromFavorite(ctx context.Context, userID string, trainingID uint, trainingVersion uint) error
 	GetFavoriteTrainings(ctx context.Context, req trainings.GetFavoritesRequest) (trainings.GetTrainingsResponse, error)
+	UpdateDisabledStatus(ctx context.Context, trainingID uint, disabled bool) error
 }
 
 type TrainingRepository struct {
@@ -56,6 +57,7 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 		Preload("Exercises").
 		Preload("Reviews").
 		Preload("Tags").
+		Where("disabled = false").
 		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
 					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
 		First(&training, "id = ?", trainingID)
@@ -84,6 +86,7 @@ func (repo TrainingRepository) GetTrainingByIDAndVersion(ctx context.Context, tr
 		Preload("Exercises").
 		Preload("Reviews").
 		Preload("Tags").
+		Where("disabled = false").
 		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
 					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
 		First(&training, "id = ? AND version = ?", trainingID, version)
@@ -107,6 +110,12 @@ func (repo TrainingRepository) GetTrainingByIDAndVersion(ctx context.Context, tr
 func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainings.GetTrainingsRequest) (trainings.GetTrainingsResponse, error) {
 	var res []models.TrainingPlan
 	db := repo.db.WithContext(ctx)
+
+	if req.Disabled == nil {
+		db = db.Where("disabled = ?", false)
+	} else {
+		db = db.Where("disabled = ?", *req.Disabled)
+	}
 
 	if req.Name != "" {
 		likeName := fmt.Sprintf("%v%%", strings.ToLower(req.Name))
@@ -187,6 +196,50 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 	return training, nil
 }
 
+// func (repo TrainingRepository) UpdateDisabledStatus(ctx context.Context, trainingID uint, disabled bool) error {
+// 	db := repo.db.WithContext(ctx)
+
+// 	result := db.Model(&models.TrainingPlan{}).Where("id = ?", trainingID).Update("disabled", disabled)
+// 	if result.Error != nil {
+// 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+// 			return contracts.ErrTrainingPlanNotFound
+// 		}
+// 		repo.logger.Error("Unable to update training plan", zap.Error(result.Error))
+// 		return result.Error
+// 	}
+// 	if result.RowsAffected < 1 {
+// 		return contracts.ErrTrainingPlanNotFound
+// 	}
+// 	return nil
+// }
+
+func (repo TrainingRepository) UpdateDisabledStatus(ctx context.Context, trainingID uint, disabled bool) error {
+	db := repo.db.WithContext(ctx)
+
+	training := models.TrainingPlan{}
+	if err := db.First(&training, trainingID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return contracts.ErrTrainingPlanNotFound
+		}
+		repo.logger.Error("Unable to find training plan", zap.Error(err))
+		return err
+	}
+
+	if training.Disabled == disabled {
+		if disabled {
+			return contracts.ErrTrainingAlreadyDisabled
+		}
+		return contracts.ErrTrainingNotDisabled
+	}
+
+	result := db.Model(&training).Update("disabled", disabled)
+	if result.Error != nil {
+		repo.logger.Error("Unable to update training plan", zap.Error(result.Error))
+		return result.Error
+	}
+	return nil
+}
+
 func (repo TrainingRepository) DeleteTrainingPlan(ctx context.Context, trainingID uint) error {
 	db := repo.db.WithContext(ctx)
 	result := db.Select("Exercises", "Reviews", "Favorites").Delete(&models.TrainingPlan{ID: trainingID})
@@ -230,7 +283,7 @@ func (repo TrainingRepository) GetFavoriteTrainings(ctx context.Context, req tra
 	var res []models.TrainingPlan
 	db := repo.db.WithContext(ctx)
 	result := db.Joins("JOIN favorites ON training_plans.id = favorites.training_plan_id").
-		Where("favorites.user_id = ?", req.UserID).
+		Where("favorites.user_id = ? && training_plans.disabled = false", req.UserID).
 		Scopes(database.Paginate(&res, &req.Pagination, db)).
 		Preload("Exercises").
 		Preload("Reviews").

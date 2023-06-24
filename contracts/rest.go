@@ -17,6 +17,8 @@ var errCodes = map[error]string{
 	ErrInvalidGoalType:                "T13",
 	ErrInvalidGoalSubtype:             "T14",
 	ErrGoalNotFound:                   "T15",
+	ErrAlreadyLiked:                   "T16",
+	ErrNotLiked:                       "T17",
 	ErrUserInternal:                   "U0",
 	ErrUserBadRequest:                 "U1",
 	ErrUserNotFound:                   "U2",

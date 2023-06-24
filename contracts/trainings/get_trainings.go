@@ -15,6 +15,7 @@ type GetTrainingsRequest struct {
 	UserID      string   `form:"user_id"`
 	TagStrings  []string `form:"tags[]"`
 	Tags        []models.Tag
+	Disabled    *bool `form:"disabled"`
 	contracts.Pagination
 }
 

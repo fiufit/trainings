@@ -59,7 +59,8 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 		Preload("Tags").
 		Where("disabled = false").
 		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
-					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
+					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count, 
+					(SELECT COUNT(*) FROM training_sessions WHERE training_sessions.training_plan_id = training_plans.id) as sessions_count`).
 		First(&training, "id = ?", trainingID)
 
 	if result.Error != nil {
@@ -75,6 +76,7 @@ func (repo TrainingRepository) GetTrainingByID(ctx context.Context, trainingID u
 
 	training.MeanScore = resultStruct.MeanScore
 	training.FavoritesCount = resultStruct.FavoritesCount
+	training.SessionsCount = resultStruct.SessionsCount
 
 	return training, nil
 }
@@ -88,7 +90,8 @@ func (repo TrainingRepository) GetTrainingByIDAndVersion(ctx context.Context, tr
 		Preload("Tags").
 		Where("disabled = false").
 		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
-					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
+					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count, 
+					(SELECT COUNT(*) FROM training_sessions WHERE training_sessions.training_plan_id = training_plans.id) as sessions_count`).
 		First(&training, "id = ? AND version = ?", trainingID, version)
 
 	if result.Error != nil {
@@ -104,6 +107,7 @@ func (repo TrainingRepository) GetTrainingByIDAndVersion(ctx context.Context, tr
 
 	training.MeanScore = resultStruct.MeanScore
 	training.FavoritesCount = resultStruct.FavoritesCount
+	training.SessionsCount = resultStruct.SessionsCount
 
 	return training, nil
 }
@@ -144,7 +148,8 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 	}
 
 	db = db.Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
-					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
+					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count, 
+					(SELECT COUNT(*) FROM training_sessions WHERE training_sessions.training_plan_id = training_plans.id) as sessions_count`).
 		Order("mean_score DESC")
 
 	result := db.
@@ -165,6 +170,7 @@ func (repo TrainingRepository) GetTrainingPlans(ctx context.Context, req trainin
 	for i := range res {
 		res[i].MeanScore = results[i].MeanScore
 		res[i].FavoritesCount = results[i].FavoritesCount
+		res[i].SessionsCount = results[i].SessionsCount
 	}
 
 	return trainings.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
@@ -181,6 +187,7 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 	training.Version = oldPlan.Version + 1
 	training.MeanScore = oldPlan.MeanScore
 	training.FavoritesCount = oldPlan.FavoritesCount
+	training.SessionsCount = oldPlan.SessionsCount
 
 	deleteOldResult := db.Select("Exercises").Delete(&models.TrainingPlan{ID: oldPlan.ID, Version: oldPlan.Version})
 	if deleteOldResult.Error != nil {
@@ -270,8 +277,9 @@ func (repo TrainingRepository) GetFavoriteTrainings(ctx context.Context, req tra
 		Preload("Exercises").
 		Preload("Reviews").
 		Preload("Tags").
-		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score,
-					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count`).
+		Select(`training_plans.*, COALESCE((SELECT AVG(score) FROM reviews WHERE reviews.training_plan_id = training_plans.id), 0) as mean_score, 
+					(SELECT COUNT(*) FROM favorites WHERE favorites.training_plan_id = training_plans.id) AS favorites_count, 
+					(SELECT COUNT(*) FROM training_sessions WHERE training_sessions.training_plan_id = training_plans.id) as sessions_count`).
 		Find(&res)
 	if result.Error != nil {
 		repo.logger.Error("Unable to get favorite trainings", zap.Error(result.Error))
@@ -283,6 +291,7 @@ func (repo TrainingRepository) GetFavoriteTrainings(ctx context.Context, req tra
 	for i := range res {
 		res[i].MeanScore = results[i].MeanScore
 		res[i].FavoritesCount = results[i].FavoritesCount
+		res[i].SessionsCount = results[i].SessionsCount
 	}
 	return trainings.GetTrainingsResponse{TrainingPlans: res, Pagination: req.Pagination}, nil
 }
@@ -291,4 +300,5 @@ type Result struct {
 	models.TrainingPlan
 	MeanScore      float32
 	FavoritesCount uint
+	SessionsCount  uint
 }

@@ -196,23 +196,6 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 	return training, nil
 }
 
-// func (repo TrainingRepository) UpdateDisabledStatus(ctx context.Context, trainingID uint, disabled bool) error {
-// 	db := repo.db.WithContext(ctx)
-
-// 	result := db.Model(&models.TrainingPlan{}).Where("id = ?", trainingID).Update("disabled", disabled)
-// 	if result.Error != nil {
-// 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-// 			return contracts.ErrTrainingPlanNotFound
-// 		}
-// 		repo.logger.Error("Unable to update training plan", zap.Error(result.Error))
-// 		return result.Error
-// 	}
-// 	if result.RowsAffected < 1 {
-// 		return contracts.ErrTrainingPlanNotFound
-// 	}
-// 	return nil
-// }
-
 func (repo TrainingRepository) UpdateDisabledStatus(ctx context.Context, trainingID uint, disabled bool) error {
 	db := repo.db.WithContext(ctx)
 

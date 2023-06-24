@@ -45,36 +45,10 @@ func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req train
 }
 
 func (uc *TrainingUpdaterImpl) EnableTrainingPlan(ctx context.Context, trainingID uint) error {
-	// training, err := uc.trainings.GetTrainingByID(ctx, trainingID)
-	// if err != nil {
-	// 	return err
-	// }
-	// if training.Disabled {
-	// 	err = uc.trainings.UpdateDisabledStatus(ctx, trainingID, false)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// } else {
-	// 	return contracts.ErrTrainingNotDisabled
-	// }
-	// return nil
 	return uc.trainings.UpdateDisabledStatus(ctx, trainingID, false)
 }
 
 func (uc *TrainingUpdaterImpl) DisableTrainingPlan(ctx context.Context, trainingID uint) error {
-	// training, err := uc.trainings.GetTrainingByID(ctx, trainingID)
-	// if err != nil {
-	// 	return err
-	// }
-	// if !training.Disabled {
-	// 	err = uc.trainings.UpdateDisabledStatus(ctx, trainingID, true)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// } else {
-	// 	return contracts.ErrTrainingAlreadyDisabled
-	// }
-	// return nil
 	return uc.trainings.UpdateDisabledStatus(ctx, trainingID, true)
 }
 

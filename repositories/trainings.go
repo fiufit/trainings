@@ -265,8 +265,7 @@ func (repo TrainingRepository) RemoveFromFavorite(ctx context.Context, userID st
 func (repo TrainingRepository) GetFavoriteTrainings(ctx context.Context, req trainings.GetFavoritesRequest) (trainings.GetTrainingsResponse, error) {
 	var res []models.TrainingPlan
 	db := repo.db.WithContext(ctx)
-	result := db.Joins("JOIN favorites ON training_plans.id = favorites.training_plan_id").
-		Where("favorites.user_id = ? && training_plans.disabled = false", req.UserID).
+	result := db.Where("training_plans.id IN (SELECT training_plan_id FROM favorites WHERE user_id = ?) AND training_plans.disabled = false", req.UserID).
 		Scopes(database.Paginate(&res, &req.Pagination, db)).
 		Preload("Exercises").
 		Preload("Reviews").

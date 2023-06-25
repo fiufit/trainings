@@ -26,4 +26,6 @@ var (
 	ErrGoalNotFound                   = errors.New("goal not found")
 	ErrAlreadyLiked                   = errors.New("user already added training plan to favorites")
 	ErrNotLiked                       = errors.New("user didn't add training plan to favorites")
+	ErrTrainingAlreadyDisabled        = errors.New("training plan already disabled")
+	ErrTrainingNotDisabled            = errors.New("training plan not disabled")
 )

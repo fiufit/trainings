@@ -12,6 +12,8 @@ import (
 
 type TrainingUpdater interface {
 	UpdateTrainingPlan(ctx context.Context, req trainings.UpdateTrainingRequest) (models.TrainingPlan, error)
+	EnableTrainingPlan(ctx context.Context, trainingID uint) error
+	DisableTrainingPlan(ctx context.Context, trainingID uint) error
 }
 
 type TrainingUpdaterImpl struct {
@@ -40,6 +42,14 @@ func (uc *TrainingUpdaterImpl) UpdateTrainingPlan(ctx context.Context, req train
 		return models.TrainingPlan{}, err
 	}
 	return updatedTraining, nil
+}
+
+func (uc *TrainingUpdaterImpl) EnableTrainingPlan(ctx context.Context, trainingID uint) error {
+	return uc.trainings.UpdateDisabledStatus(ctx, trainingID, false)
+}
+
+func (uc *TrainingUpdaterImpl) DisableTrainingPlan(ctx context.Context, trainingID uint) error {
+	return uc.trainings.UpdateDisabledStatus(ctx, trainingID, true)
 }
 
 func (uc *TrainingUpdaterImpl) getTrainingPlan(ctx context.Context, trainingID uint, trainerID string) (models.TrainingPlan, error) {

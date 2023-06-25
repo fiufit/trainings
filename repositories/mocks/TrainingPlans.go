@@ -154,6 +154,20 @@ func (_m *TrainingPlans) RemoveFromFavorite(ctx context.Context, userID string, 
 	return r0
 }
 
+// UpdateDisabledStatus provides a mock function with given fields: ctx, trainingID, disabled
+func (_m *TrainingPlans) UpdateDisabledStatus(ctx context.Context, trainingID uint, disabled bool) error {
+	ret := _m.Called(ctx, trainingID, disabled)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint, bool) error); ok {
+		r0 = rf(ctx, trainingID, disabled)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // UpdateTrainingPlan provides a mock function with given fields: ctx, training
 func (_m *TrainingPlans) UpdateTrainingPlan(ctx context.Context, training models.TrainingPlan) (models.TrainingPlan, error) {
 	ret := _m.Called(ctx, training)

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
@@ -31,14 +30,10 @@ func (h GetFavorites) Handle() gin.HandlerFunc {
 		req.Pagination.Validate()
 		resTrainings, err := h.trainings.GetFavoritePlans(ctx, req)
 		if err != nil {
-			if errors.Is(err, contracts.ErrUserNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
-				return
-			}
-
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
+
 		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(resTrainings))
 	}
 }

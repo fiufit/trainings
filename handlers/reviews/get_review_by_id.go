@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
@@ -25,15 +24,7 @@ func (h GetReviewByID) Handle() gin.HandlerFunc {
 		reviewID := ctx.MustGet("reviewID").(uint)
 		review, err := h.reviews.GetReviewByID(ctx, trainingID, reviewID)
 		if err != nil {
-			if errors.Is(err, contracts.ErrTrainingPlanNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
-				return
-			}
-			if errors.Is(err, contracts.ErrReviewNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
-				return
-			}
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
 		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(review))

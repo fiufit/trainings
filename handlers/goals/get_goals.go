@@ -29,7 +29,7 @@ func (h GetGoals) Handle() gin.HandlerFunc {
 		}
 		resGoals, err := h.goals.GetGoals(ctx, req)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
 		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(resGoals))

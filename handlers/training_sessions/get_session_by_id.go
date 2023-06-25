@@ -1,7 +1,6 @@
 package training_sessions
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
@@ -23,18 +22,8 @@ func (h GetTrainingSessionByID) Handle() gin.HandlerFunc {
 		requesterID := ctx.Query("requester_id")
 
 		ts, err := h.uc.GetByID(ctx, trainingSessionID, requesterID)
-
 		if err != nil {
-			if errors.Is(err, contracts.ErrUnauthorizedAthlete) {
-				ctx.JSON(http.StatusUnauthorized, contracts.FormatErrResponse(err))
-				return
-			}
-			if errors.Is(err, contracts.ErrTrainingSessionNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
-				return
-			}
-
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
 

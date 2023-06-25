@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
@@ -24,11 +23,7 @@ func (h GetGoalByID) Handle() gin.HandlerFunc {
 		goalID := ctx.MustGet("goalID").(uint)
 		goal, err := h.goals.GetGoalByID(ctx, goalID)
 		if err != nil {
-			if errors.Is(err, contracts.ErrGoalNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(err))
-				return
-			}
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
 		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(goal))

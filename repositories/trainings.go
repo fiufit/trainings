@@ -188,6 +188,7 @@ func (repo TrainingRepository) UpdateTrainingPlan(ctx context.Context, training 
 	training.MeanScore = oldPlan.MeanScore
 	training.FavoritesCount = oldPlan.FavoritesCount
 	training.SessionsCount = oldPlan.SessionsCount
+	training.Reviews = oldPlan.Reviews
 
 	deleteOldResult := db.Select("Exercises").Delete(&models.TrainingPlan{ID: oldPlan.ID, Version: oldPlan.Version})
 	if deleteOldResult.Error != nil {

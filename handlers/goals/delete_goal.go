@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
@@ -33,15 +32,7 @@ func (h DeleteGoal) Handle() gin.HandlerFunc {
 
 		err = h.goals.DeleteGoal(ctx, req)
 		if err != nil {
-			if errors.Is(err, contracts.ErrGoalNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(contracts.ErrGoalNotFound))
-				return
-			}
-			if errors.Is(err, contracts.ErrUnauthorizedAthlete) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(contracts.ErrUnauthorizedAthlete))
-				return
-			}
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
 		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(""))

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
@@ -24,17 +23,7 @@ func (h DisableTraining) Handle() gin.HandlerFunc {
 		trainingID := ctx.MustGet("trainingID").(uint)
 		err := h.trainings.DisableTrainingPlan(ctx, trainingID)
 		if err != nil {
-			if errors.Is(err, contracts.ErrTrainingPlanNotFound) {
-				ctx.JSON(http.StatusNotFound, contracts.FormatErrResponse(contracts.ErrTrainingPlanNotFound))
-				return
-			}
-
-			if errors.Is(err, contracts.ErrTrainingAlreadyDisabled) {
-				ctx.JSON(http.StatusConflict, contracts.FormatErrResponse(err))
-				return
-			}
-
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
 		ctx.JSON(http.StatusOK, contracts.FormatOkResponse(""))

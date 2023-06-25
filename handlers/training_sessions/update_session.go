@@ -1,7 +1,6 @@
 package training_sessions
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/fiufit/trainings/contracts"
@@ -30,18 +29,7 @@ func (h UpdateTrainingSessions) Handle() gin.HandlerFunc {
 
 		ts, err := h.uc.UpdateTrainingSession(ctx, req)
 		if err != nil {
-			if errors.Is(err, contracts.ErrUnauthorizedAthlete) {
-				ctx.JSON(http.StatusUnauthorized, contracts.FormatErrResponse(err))
-				return
-			}
-			if errors.Is(err, contracts.ErrTrainingSessionAlreadyFinished) ||
-				errors.Is(err, contracts.ErrTrainingSessionNotComplete) {
-
-				ctx.JSON(http.StatusConflict, contracts.FormatErrResponse(err))
-				return
-			}
-
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
 

@@ -30,7 +30,7 @@ func (h GetTrainingSessions) Handle() gin.HandlerFunc {
 
 		res, err := h.uc.Get(ctx, req)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, contracts.FormatErrResponse(contracts.ErrInternal))
+			contracts.HandleErrorType(ctx, err)
 			return
 		}
 

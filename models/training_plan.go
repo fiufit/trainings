@@ -22,6 +22,6 @@ type TrainingPlan struct {
 	MeanScore      float32 `gorm:"-"`
 	FavoritesCount uint    `gorm:"-"`
 	SessionsCount  uint    `gorm:"-"`
-	Disabled       bool    `gorm:"not null;default:false" json:"-"`
+	Disabled       bool    `gorm:"not null;default:false"`
 	PictureUrl     string  `gorm:"-"`
 }

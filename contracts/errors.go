@@ -89,6 +89,8 @@ func HandleErrorType(ctx *gin.Context, err error) {
 		status = http.StatusBadRequest
 	default:
 		status = http.StatusInternalServerError
+		ctx.JSON(status, FormatErrResponse(ErrInternal))
+		return
 	}
 	ctx.JSON(status, FormatErrResponse(err))
 }

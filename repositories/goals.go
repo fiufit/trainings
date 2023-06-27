@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockery --name Goals
 type Goals interface {
 	Create(ctx context.Context, goal models.Goal) (models.Goal, error)
 	GetByID(ctx context.Context, goalID uint) (models.Goal, error)

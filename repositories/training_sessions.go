@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockery --name TrainingSessions
 type TrainingSessions interface {
 	Create(ctx context.Context, session models.TrainingSession) (models.TrainingSession, error)
 	Get(ctx context.Context, req tsContracts.GetTrainingSessionsRequest) ([]models.TrainingSession, error)

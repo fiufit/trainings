@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
+//go:generate mockery --name Notifications
 type Notifications interface {
 	SendGoalNotification(ctx context.Context, goal models.Goal) error
 }

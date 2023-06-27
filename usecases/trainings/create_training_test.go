@@ -15,6 +15,20 @@ import (
 	"go.uber.org/zap/zaptest"
 )
 
+func TestNewTrainingCreatorImpl(t *testing.T) {
+	trainingRepo := new(mocks.TrainingPlans)
+	userRepo := new(mocks.Users)
+	metricsRepo := new(mocks.Metrics)
+
+	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, metricsRepo, zaptest.NewLogger(t))
+
+	assert.NotNil(t, trainingUc)
+	assert.NotNil(t, trainingUc.trainings)
+	assert.NotNil(t, trainingUc.users)
+	assert.NotNil(t, trainingUc.metrics)
+	assert.NotNil(t, trainingUc.logger)
+}
+
 func TestCreateTrainingOk(t *testing.T) {
 
 	ctx := context.Background()

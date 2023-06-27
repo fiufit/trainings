@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fiufit/trainings/models"
-	"github.com/go-playground/assert/v2"
+	"github.com/stretchr/testify/assert"
 	"github.com/undefinedlabs/go-mpatch"
 )
 
@@ -115,4 +115,62 @@ func TestConverToTrainingPlanOk(t *testing.T) {
 	res := ConverToTrainingPlan(req.BaseTrainingRequest)
 
 	assert.Equal(t, res, training)
+}
+
+func TestConverToTrainingPlanWithEmptyExercisesOk(t *testing.T) {
+	creationDate := time.Now()
+
+	req := CreateTrainingRequest{
+		BaseTrainingRequest: BaseTrainingRequest{
+			Name:        "Test Training Name",
+			Description: "Test Training Description",
+			TrainerID:   "Test Trainer ID",
+			Exercises:   []ExerciseRequest{},
+		},
+	}
+
+	training := models.TrainingPlan{
+		ID:          uint(0),
+		Name:        "Test Training Name",
+		Description: "Test Training Description",
+		TrainerID:   "Test Trainer ID",
+		CreatedAt:   creationDate,
+		Exercises:   []models.Exercise{},
+	}
+
+	res := ConverToTrainingPlan(req.BaseTrainingRequest)
+
+	assert.Equal(t, res, training)
+}
+
+func TestValidateValidCreateTrainingRequestOk(t *testing.T) {
+	req := CreateTrainingRequest{
+		BaseTrainingRequest: BaseTrainingRequest{
+			Name:        "Test Training Name",
+			Description: "Test Training Description",
+			TrainerID:   "Test Trainer ID",
+			Exercises:   []ExerciseRequest{},
+			TagStrings:  []string{"speed", "strength"},
+		},
+	}
+
+	err := req.Validate()
+
+	assert.NoError(t, err)
+}
+
+func TestValidateInvalidCreateTrainingRequestErr(t *testing.T) {
+	req := CreateTrainingRequest{
+		BaseTrainingRequest: BaseTrainingRequest{
+			Name:        "",
+			Description: "Test Training Description",
+			TrainerID:   "Test Trainer ID",
+			Exercises:   []ExerciseRequest{},
+			TagStrings:  []string{"invalid", "speed"},
+		},
+	}
+
+	err := req.Validate()
+
+	assert.Error(t, err)
 }

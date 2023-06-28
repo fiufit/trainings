@@ -2,6 +2,8 @@
 
 Microservice for managing fiufit training plans
 
+[![Fly Deploy](https://github.com/fiufit/trainings/actions/workflows/fly.yml/badge.svg?branch=main)](https://github.com/fiufit/trainings/actions/workflows/fly.yml)
+
 [![test](https://github.com/fiufit/trainings/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/fiufit/trainings/actions/workflows/test.yml)
 [![Lint Go Code](https://github.com/fiufit/trainings/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/fiufit/trainings/actions/workflows/lint.yml)
 

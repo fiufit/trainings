@@ -8,6 +8,10 @@ Microservice for managing fiufit training plans
 
 [![codecov](https://codecov.io/github/fiufit/trainings/branch/main/graph/badge.svg?token=CXUBV3XKVZ)](https://codecov.io/github/fiufit/trainings)
 
+## Code coverage graph
+
+![codecov.io](https://codecov.io/github/fiufit/trainings/branch/main/graphs/sunburst.svg?token=CXUBV3XKVZ)
+
 
 ## Links
 

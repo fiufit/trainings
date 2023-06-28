@@ -22,14 +22,14 @@ func TestTrainingSessionRepository_Create_OK(t *testing.T) {
 	}
 	_ = db.Create(&testTrainingPlan)
 	testTrainingSession := models.TrainingSession{
-		TrainingPlanID:      1,
-		TrainingPlanVersion: 1,
+		TrainingPlanID:      testTrainingPlan.ID,
+		TrainingPlanVersion: testTrainingPlan.Version,
 		TrainingPlan:        testTrainingPlan,
 	}
 
 	createdTrainingSession, err := repository.Create(ctx, testTrainingSession)
 	assert.NoError(t, err)
-	assert.Equal(t, createdTrainingSession.ID, uint(1))
+	assert.Equal(t, createdTrainingSession.TrainingPlan, testTrainingSession.TrainingPlan)
 
 }
 

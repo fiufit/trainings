@@ -2,6 +2,7 @@ package trainings
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -118,6 +119,43 @@ func TestGetTrainingPlansOk(t *testing.T) {
 	assert.Equal(t, trainings.GetTrainingsResponse{TrainingPlans: []models.TrainingPlan{training}}, resp)
 }
 
+func TestGetTrainingPlansErr(t *testing.T) {
+	ctx := context.Background()
+	trainerID := "test"
+	trainingPlanID := uint(1)
+
+	req := trainings.GetTrainingsRequest{
+		TrainerID: trainerID,
+	}
+
+	training := models.TrainingPlan{
+		ID:        trainingPlanID,
+		TrainerID: trainerID,
+		Name:      "test",
+		CreatedAt: time.Now(),
+		Tags:      []models.Tag{{Name: "tag1"}, {Name: "tag2"}},
+		Exercises: []models.Exercise{
+			{
+				Title:       "exercise1",
+				Description: "description1",
+			},
+		},
+	}
+
+	trainingRepo := new(mocks.TrainingPlans)
+	firebaseRepo := new(mocks.Firebase)
+	userRepo := new(mocks.Users)
+	trainingRepo.On("GetTrainingPlans", ctx, req).Return(trainings.GetTrainingsResponse{}, errors.New("test"))
+	firebaseRepo.On("FillTrainingPicture", ctx, &training).Return(nil)
+
+	trainingUc := NewTrainingGetterImpl(trainingRepo, firebaseRepo, userRepo, zaptest.NewLogger(t))
+
+	resp, err := trainingUc.GetTrainingPlans(ctx, req)
+
+	assert.Error(t, err)
+	assert.Equal(t, trainings.GetTrainingsResponse{}, resp)
+}
+
 func TestGetRecommendedPlansOk(t *testing.T) {
 	ctx := context.Background()
 	userID := "user_test"
@@ -187,6 +225,31 @@ func TestGetRecommendedPlansForNonExistingUser(t *testing.T) {
 	assert.Equal(t, trainings.GetTrainingsResponse{}, resp)
 }
 
+func TestGetRecommendedPlansWithInvalidTagsErr(t *testing.T) {
+	ctx := context.Background()
+	userID := "user_test"
+
+	ucReq := trainings.GetTrainingsRequest{
+		UserID: userID,
+	}
+
+	user := models.User{
+		ID:        userID,
+		Interests: []models.UserInterest{{Name: "invalid_tag_1"}, {Name: "invalid_tag_2"}},
+	}
+
+	userRepo := new(mocks.Users)
+	userRepo.On("GetUserByID", ctx, userID).Return(user, nil)
+
+	trainingUc := NewTrainingGetterImpl(nil, nil, userRepo, zaptest.NewLogger(t))
+
+	resp, err := trainingUc.GetRecommendedPlans(ctx, ucReq)
+
+	assert.Error(t, err)
+	assert.Equal(t, contracts.ErrInvalidTag, err)
+	assert.Equal(t, trainings.GetTrainingsResponse{}, resp)
+}
+
 func TestGetFavoritePlansOk(t *testing.T) {
 	ctx := context.Background()
 	userID := "user_test"
@@ -248,5 +311,32 @@ func TestGetFavoritePlansForNonExistingUserErr(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Equal(t, contracts.ErrUserNotFound, err)
+	assert.Equal(t, trainings.GetTrainingsResponse{}, resp)
+}
+
+func TestGetFavoritePlansErr(t *testing.T) {
+	ctx := context.Background()
+	userID := "user_test"
+
+	ucReq := trainings.GetFavoritesRequest{
+		UserID: userID,
+	}
+
+	user := models.User{
+		ID: userID,
+	}
+
+	userRepo := new(mocks.Users)
+	userRepo.On("GetUserByID", ctx, userID).Return(user, nil)
+
+	trainingRepo := new(mocks.TrainingPlans)
+	trainingRepo.On("GetFavoriteTrainings", ctx, trainings.GetFavoritesRequest{UserID: userID}).Return(trainings.GetTrainingsResponse{}, contracts.ErrInternal)
+
+	trainingUc := NewTrainingGetterImpl(trainingRepo, nil, userRepo, zaptest.NewLogger(t))
+
+	resp, err := trainingUc.GetFavoritePlans(ctx, ucReq)
+
+	assert.Error(t, err)
+	assert.Equal(t, contracts.ErrInternal, err)
 	assert.Equal(t, trainings.GetTrainingsResponse{}, resp)
 }

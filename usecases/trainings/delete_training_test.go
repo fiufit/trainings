@@ -64,3 +64,24 @@ func TestDeleteTrainingUnauthorizedTrainerError(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, contracts.ErrUnauthorizedTrainer, err)
 }
+
+func TestDeleteTrainingNotFoundError(t *testing.T) {
+	ctx := context.Background()
+	trainerID := "test"
+	trainingPlanID := uint(1)
+
+	req := trainings.DeleteTrainingRequest{
+		TrainerID:      trainerID,
+		TrainingPlanID: trainingPlanID,
+	}
+
+	trainingRepo := new(mocks.TrainingPlans)
+
+	trainingRepo.On("GetTrainingByID", ctx, req.TrainingPlanID).Return(models.TrainingPlan{}, contracts.ErrTrainingPlanNotFound)
+
+	trainingUc := NewTrainingDeleterImpl(trainingRepo, zaptest.NewLogger(t))
+	err := trainingUc.DeleteTraining(ctx, req)
+
+	assert.Error(t, err)
+	assert.Equal(t, contracts.ErrTrainingPlanNotFound, err)
+}

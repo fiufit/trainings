@@ -2,6 +2,7 @@ package trainings
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"testing"
 
@@ -42,6 +43,24 @@ func TestAddToFavoriteOk(t *testing.T) {
 
 	err := trainingUc.AddToFavorite(ctx, userID, trainingID)
 	assert.NoError(t, err)
+}
+
+func TestAddToFavoriteForExistingTraningErr(t *testing.T) {
+	ctx := context.Background()
+	trainingID := uint(1)
+	trainingVersion := uint(2)
+	userID := "user_id"
+
+	trainingRepo := new(mocks.TrainingPlans)
+	metricsRepo := new(mocks.Metrics)
+
+	trainingRepo.On("GetTrainingByID", ctx, trainingID).Return(models.TrainingPlan{Version: trainingVersion}, nil)
+	trainingRepo.On("AddToFavorite", ctx, userID, trainingID, trainingVersion).Return(errors.New("test"))
+
+	trainingUc := NewFavoriteAdderImpl(trainingRepo, metricsRepo, zaptest.NewLogger(t))
+
+	err := trainingUc.AddToFavorite(ctx, userID, trainingID)
+	assert.Error(t, err)
 }
 
 func TestAddToFavoriteForNonExistingTraningErr(t *testing.T) {

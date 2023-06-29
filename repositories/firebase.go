@@ -14,6 +14,7 @@ import (
 	"google.golang.org/api/option"
 )
 
+//go:generate mockery --name Firebase
 type Firebase interface {
 	GetTrainingPictureUrl(ctx context.Context, trainingID uint, trainerID string) string
 	FillTrainingPicture(ctx context.Context, training *models.TrainingPlan)

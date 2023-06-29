@@ -14,6 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockery --name Reviews
 type Reviews interface {
 	CreateReview(ctx context.Context, review models.Review) (models.Review, error)
 	UpdateReview(ctx context.Context, review models.Review) (models.Review, error)

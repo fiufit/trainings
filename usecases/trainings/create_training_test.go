@@ -15,6 +15,20 @@ import (
 	"go.uber.org/zap/zaptest"
 )
 
+func TestNewTrainingCreatorImpl(t *testing.T) {
+	trainingRepo := new(mocks.TrainingPlans)
+	userRepo := new(mocks.Users)
+	metricsRepo := new(mocks.Metrics)
+
+	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, metricsRepo, zaptest.NewLogger(t))
+
+	assert.NotNil(t, trainingUc)
+	assert.NotNil(t, trainingUc.trainings)
+	assert.NotNil(t, trainingUc.users)
+	assert.NotNil(t, trainingUc.metrics)
+	assert.NotNil(t, trainingUc.logger)
+}
+
 func TestCreateTrainingOk(t *testing.T) {
 
 	ctx := context.Background()
@@ -31,6 +45,14 @@ func TestCreateTrainingOk(t *testing.T) {
 			Description: "Test Description",
 			TrainerID:   "Test Trainer",
 			Exercises:   []trainings.ExerciseRequest{},
+			Tags: []models.Tag{
+				{
+					Name: "speed",
+				},
+				{
+					Name: "strength",
+				},
+			},
 		},
 	}
 
@@ -44,6 +66,14 @@ func TestCreateTrainingOk(t *testing.T) {
 	metricsRepo.On("Create", ctx, metrics.CreateMetricRequest{
 		MetricType: "new_training",
 		SubType:    "testUserID",
+	})
+	metricsRepo.On("Create", ctx, metrics.CreateMetricRequest{
+		MetricType: "training_tagged",
+		SubType:    "speed",
+	})
+	metricsRepo.On("Create", ctx, metrics.CreateMetricRequest{
+		MetricType: "training_tagged",
+		SubType:    "strength",
 	})
 
 	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, metricsRepo, zaptest.NewLogger(t))
@@ -71,6 +101,36 @@ func TestCreateTrainingError(t *testing.T) {
 	training := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
 	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(models.TrainingPlan{}, errors.New("repo error"))
 	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{ID: "testUserID"}, nil)
+	metricsRepo.On("Create", ctx, metrics.CreateMetricRequest{
+		MetricType: "new_training",
+		SubType:    "testUserID",
+	})
+
+	trainingUc := NewTrainingCreatorImpl(trainingRepo, userRepo, metricsRepo, zaptest.NewLogger(t))
+	res, err := trainingUc.CreateTraining(ctx, req)
+
+	assert.Equal(t, res.TrainingPlan, models.TrainingPlan{})
+	assert.Error(t, err)
+}
+
+func TestCreateTrainingErrorUserNotFound(t *testing.T) {
+
+	ctx := context.Background()
+	req := trainings.CreateTrainingRequest{
+		BaseTrainingRequest: trainings.BaseTrainingRequest{
+			Name:        "Test Name",
+			Description: "Test Description",
+			TrainerID:   "Test Trainer",
+			Exercises:   []trainings.ExerciseRequest{},
+		},
+	}
+	trainingRepo := new(mocks.TrainingPlans)
+	userRepo := new(mocks.Users)
+	metricsRepo := new(mocks.Metrics)
+
+	training := trainings.ConverToTrainingPlan(req.BaseTrainingRequest)
+	trainingRepo.On("CreateTrainingPlan", ctx, training).Return(models.TrainingPlan{}, errors.New("repo error"))
+	userRepo.On("GetUserByID", ctx, req.TrainerID).Return(models.User{}, errors.New("user not found"))
 	metricsRepo.On("Create", ctx, metrics.CreateMetricRequest{
 		MetricType: "new_training",
 		SubType:    "testUserID",

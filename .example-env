@@ -1,0 +1,12 @@
+#RENAME THIS TO .env and remove this comment after changing the values for your execution.
+
+SERVICE_PORT=8888
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=postgres
+FIREBASE_B64_SDK_JSON=b64encodedFirebaseJsonSDKCredentials
+FIREBASE_BUCKET_NAME=yourproject.appspot.com
+USERS_SERVICE_URL=yourusersservice.com
+NOTIFICATIONS_SERVICE_URL=yournotificationservice.com

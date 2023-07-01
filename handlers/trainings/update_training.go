@@ -19,6 +19,21 @@ func NewUpdateTraining(trainings utrainings.TrainingUpdater, logger *zap.Logger)
 	return UpdateTraining{trainings: trainings, logger: logger}
 }
 
+// Update training plan godoc
+//	@Summary		Updates a training plan
+//	@Description	Updates a training plan with a name, description, difficulty, duration, exercises and tags
+//	@Tags			training_plans
+//	@Accept			json
+//	@Produce		json
+//	@Param			version					path		string							true	"API Version"
+// 	@Param			trainingID				path		uint								true	"Training ID"
+//	@Param			payload					body		trainings.UpdateTrainingRequest	true	"Body params"
+//	@Success		200						{object}	models.TrainingPlan	"Important Note: OK responses are wrapped in {"data": ... }"
+//	@Failure		400						{object}	contracts.ErrResponse
+//	@Failure		401						{object}	contracts.ErrResponse
+//	@Failure		404						{object}	contracts.ErrResponse
+//	@Failure		500						{object}	contracts.ErrResponse
+//	@Router			/{version}/trainings{training_id}	[put]
 func (h UpdateTraining) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req trainings.UpdateTrainingRequest

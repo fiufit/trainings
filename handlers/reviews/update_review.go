@@ -19,6 +19,22 @@ func NewUpdateReview(reviews ureviews.ReviewUpdater, logger *zap.Logger) UpdateR
 	return UpdateReview{reviews: reviews, logger: logger}
 }
 
+// Update review godoc
+//	@Summary		Updates a review
+//	@Description	Updates the comment and/or rating of a review given by a user for a training plan
+//	@Tags			reviews
+//	@Accept			json
+//	@Produce		json
+//	@Param			version					path		string							true	"API Version"
+// 	@Param			trainingID				path		uint								true	"Training Plan ID"
+// 	@Param			reviewID				path		uint								true	"Review ID"
+//	@Param			payload					body		reviews.UpdateReviewRequest	true	"Body params"
+//	@Success		200						{object}	string	"Important Note: OK responses are wrapped in {"data": ... }"
+//	@Failure		400						{object}	contracts.ErrResponse
+// 	@Failure		401						{object}	contracts.ErrResponse
+//	@Failure		404						{object}	contracts.ErrResponse
+//	@Failure		500						{object}	contracts.ErrResponse
+//	@Router			/{version}/trainings/{trainingID}/reviews/{reviewID} 	[patch]
 func (h UpdateReview) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req reviews.UpdateReviewRequest

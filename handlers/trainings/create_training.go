@@ -19,6 +19,19 @@ func NewCreateTraining(trainings utrainings.TrainingCreator, logger *zap.Logger)
 	return CreateTraining{trainings: trainings, logger: logger}
 }
 
+// Create training plan godoc
+//	@Summary		Creates a new training plan
+//	@Description	Creates a new training plan with a name, description, difficulty, duration, exercises and tags
+//	@Tags			training_plans
+//	@Accept			json
+//	@Produce		json
+//	@Param			version					path		string							true	"API Version"
+//	@Param			payload					body		trainings.CreateTrainingRequest	true	"Body params"
+//	@Success		200						{object}	trainings.CreateTrainingResponse	"Important Note: OK responses are wrapped in {"data": ... }"
+//	@Failure		400						{object}	contracts.ErrResponse
+//	@Failure		404						{object}	contracts.ErrResponse
+//	@Failure		500						{object}	contracts.ErrResponse
+//	@Router			/{version}/trainings	[post]
 func (h CreateTraining) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req trainings.CreateTrainingRequest

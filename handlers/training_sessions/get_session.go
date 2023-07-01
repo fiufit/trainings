@@ -17,6 +17,19 @@ func NewGetTrainingSessions(uc training_sessions.TrainingSessionGetter) GetTrain
 	return GetTrainingSessions{uc: uc}
 }
 
+//	Get training sessions godoc
+//	@Summary		Get training sessions
+//	@Description	Gets all training sessions of a user for a given training plan
+//	@Tags			training_sessions
+//	@Accept			json
+//	@Produce		json
+//	@Param			version					path		string							true	"API Version"
+// 	@Param			userID					query		string							true	"User ID"
+// 	@Param			trainingID				query		uint								false	"Training Plan ID"
+//	@Success		200						{object}	tsContracts.GetTrainingSessionsResponse	"Important Note: OK responses are wrapped in {"data": ... }"
+//	@Failure		400						{object}	contracts.ErrResponse
+//	@Failure		500						{object}	contracts.ErrResponse
+//	@Router			/{version}/training_sessions	[get]
 func (h GetTrainingSessions) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req tsContracts.GetTrainingSessionsRequest

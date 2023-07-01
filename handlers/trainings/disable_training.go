@@ -18,6 +18,20 @@ func NewDisableTraining(trainings utrainings.TrainingUpdater, logger *zap.Logger
 	return DisableTraining{trainings: trainings, logger: logger}
 }
 
+// Disable training plan godoc
+//	@Summary		Disables a training plan
+//	@Description	Disables a training plan that had been enabled previously (or had never been disabled) given its ID
+//	@Tags			training_plans
+//	@Accept			json
+//	@Produce		json
+//	@Param			version					path		string							true	"API Version"
+// 	@Param			trainingID				path		uint								true	"Training plan ID"
+//	@Success		200						{object}	string	"Important Note: OK responses are wrapped in {"data": ... }"
+//	@Failure		400						{object}	contracts.ErrResponse
+//	@Failure		404						{object}	contracts.ErrResponse
+// 	@Failure		409						{object}	contracts.ErrResponse
+//	@Failure		500						{object}	contracts.ErrResponse
+//	@Router			/{version}/trainings/{trainingID}/disable	[delete]
 func (h DisableTraining) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		trainingID := ctx.MustGet("trainingID").(uint)

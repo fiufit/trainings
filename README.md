@@ -33,4 +33,5 @@ Microservice for managing fiufit training plans
 
 ### Links
 * Fly.io deploy dashboard: https://fly.io/apps/fiufit-trainings
+* Swagger docs: https://fiufit-trainings.fly.dev/v1/docs/index.html
 * Coverage report: https://app.codecov.io/github/fiufit/trainings

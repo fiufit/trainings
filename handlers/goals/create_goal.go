@@ -19,6 +19,19 @@ func NewCreateGoal(goals ugoals.GoalCreator, logger *zap.Logger) CreateGoal {
 	return CreateGoal{goals: goals, logger: logger}
 }
 
+// Create goal godoc
+//	@Summary		Creates a new goal
+//	@Description	Creates a new training goal for a given userID
+//	@Tags			goals
+//	@Accept			json
+//	@Produce		json
+//	@Param			version					path		string							true	"API Version"
+//	@Param			payload					body		goals.CreateGoalRequest	true	"Body params"
+//	@Success		200						{object}	models.Goal	"Important Note: OK responses are wrapped in {"data": ... }"
+//	@Failure		400						{object}	contracts.ErrResponse
+//	@Failure		404						{object}	contracts.ErrResponse
+//	@Failure		500						{object}	contracts.ErrResponse
+//	@Router			/{version}/goals 	[post]
 func (h CreateGoal) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req goals.CreateGoalRequest

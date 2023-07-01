@@ -1,8 +1,11 @@
 package server
 
 import (
+	_ "github.com/fiufit/trainings/docs"
 	"github.com/fiufit/trainings/middleware"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func (s *Server) InitRoutes() {
@@ -18,7 +21,12 @@ func (s *Server) InitRoutes() {
 	s.InitReviewRoutes(reviewRouter)
 	s.InitTrainingSessionRoutes(sessionRouter)
 	s.InitGoalsRoutes(goalsRouter)
+	s.InitDocRoutes(baseRouter)
 
+}
+
+func (s *Server) InitDocRoutes(router *gin.RouterGroup) {
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
 
 func (s *Server) InitGoalsRoutes(router *gin.RouterGroup) {

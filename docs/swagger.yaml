@@ -1,0 +1,1821 @@
+basePath: /
+definitions:
+  contracts.ErrPayload:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+    type: object
+  contracts.ErrResponse:
+    properties:
+      error:
+        $ref: '#/definitions/contracts.ErrPayload'
+    type: object
+  contracts.Pagination:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_rows:
+        type: integer
+    type: object
+  exercises.CreateExerciseRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+      trainer_id:
+        type: string
+      trainingPlanID:
+        type: integer
+    required:
+    - description
+    - title
+    - trainer_id
+    type: object
+  exercises.DeleteExerciseRequest:
+    properties:
+      exerciseID:
+        type: integer
+      trainer_id:
+        type: string
+      trainingPlanID:
+        type: integer
+    required:
+    - trainer_id
+    type: object
+  exercises.UpdateExerciseRequest:
+    properties:
+      description:
+        type: string
+      exerciseID:
+        type: integer
+      title:
+        type: string
+      trainer_id:
+        type: string
+      trainingPlanID:
+        type: integer
+    required:
+    - trainer_id
+    type: object
+  goals.CreateGoalRequest:
+    properties:
+      deadline:
+        type: string
+      subtype:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+      value:
+        type: integer
+    required:
+    - deadline
+    - title
+    - type
+    - user_id
+    - value
+    type: object
+  goals.DeleteGoalRequest:
+    properties:
+      goalID:
+        type: integer
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  goals.GetGoalsResponse:
+    properties:
+      goals:
+        items:
+          $ref: '#/definitions/models.Goal'
+        type: array
+    type: object
+  goals.UpdateGoalRequest:
+    properties:
+      deadline:
+        type: string
+      goalID:
+        type: integer
+      title:
+        type: string
+      user_id:
+        type: string
+      value:
+        type: integer
+    required:
+    - user_id
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.Exercise:
+    properties:
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      trainingPlanID:
+        type: integer
+      trainingPlanVersion:
+        type: integer
+    type: object
+  models.ExerciseSession:
+    properties:
+      done:
+        type: boolean
+      exercise:
+        $ref: '#/definitions/models.Exercise'
+      exerciseID:
+        type: integer
+      id:
+        type: integer
+      trainingSessionID:
+        type: integer
+    type: object
+  models.Goal:
+    properties:
+      created_at:
+        type: string
+      deadline:
+        type: string
+      id:
+        type: integer
+      progress:
+        type: integer
+      subtype:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+      value:
+        type: integer
+    type: object
+  models.Review:
+    properties:
+      comment:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      score:
+        type: integer
+      trainingPlanID:
+        type: integer
+      trainingPlanVersion:
+        type: integer
+      user:
+        $ref: '#/definitions/models.User'
+      userID:
+        type: string
+    type: object
+  models.Tag:
+    properties:
+      name:
+        type: string
+    type: object
+  models.TrainingPlan:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      description:
+        type: string
+      difficulty:
+        type: string
+      disabled:
+        type: boolean
+      duration:
+        type: integer
+      exercises:
+        items:
+          $ref: '#/definitions/models.Exercise'
+        type: array
+      favoritesCount:
+        type: integer
+      id:
+        type: integer
+      meanScore:
+        type: number
+      name:
+        type: string
+      pictureUrl:
+        type: string
+      reviews:
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
+      sessionsCount:
+        type: integer
+      tags:
+        items:
+          $ref: '#/definitions/models.Tag'
+        type: array
+      trainerID:
+        type: string
+      version:
+        type: integer
+    type: object
+  models.TrainingSession:
+    properties:
+      done:
+        type: boolean
+      exerciseSessions:
+        items:
+          $ref: '#/definitions/models.ExerciseSession'
+        type: array
+      id:
+        type: integer
+      secondsCount:
+        type: integer
+      stepCount:
+        type: integer
+      trainingPlan:
+        $ref: '#/definitions/models.TrainingPlan'
+      trainingPlanID:
+        type: integer
+      trainingPlanVersion:
+        type: integer
+      updatedAt:
+        type: string
+      userID:
+        type: string
+    type: object
+  models.User:
+    properties:
+      bornAt:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      displayName:
+        type: string
+      height:
+        type: integer
+      id:
+        type: string
+      interests:
+        items:
+          $ref: '#/definitions/models.UserInterest'
+        type: array
+      isMale:
+        type: boolean
+      isVerifiedTrainer:
+        type: boolean
+      mainLocation:
+        type: string
+      nickname:
+        type: string
+      pictureUrl:
+        type: string
+      weight:
+        type: integer
+    type: object
+  models.UserInterest:
+    properties:
+      name:
+        type: string
+    type: object
+  reviews.CreateReviewRequest:
+    properties:
+      comment:
+        type: string
+      score:
+        type: integer
+      trainingPlanID:
+        type: integer
+      user_id:
+        type: string
+    required:
+    - score
+    - user_id
+    type: object
+  reviews.DeleteReviewRequest:
+    properties:
+      reviewID:
+        type: integer
+      trainingPlanID:
+        type: integer
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  reviews.GetReviewsResponse:
+    properties:
+      pagination:
+        $ref: '#/definitions/contracts.Pagination'
+      reviews:
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
+    type: object
+  reviews.UpdateReviewRequest:
+    properties:
+      comment:
+        type: string
+      reviewID:
+        type: integer
+      score:
+        type: integer
+      trainingPlanID:
+        type: integer
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+  training_sessions.CreateTrainingSessionResponse:
+    properties:
+      training_session:
+        $ref: '#/definitions/models.TrainingSession'
+    type: object
+  training_sessions.GetTrainingSessionsResponse:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_rows:
+        type: integer
+      training_sessions:
+        items:
+          $ref: '#/definitions/models.TrainingSession'
+        type: array
+    type: object
+  training_sessions.UpdateExerciseSessionRequest:
+    properties:
+      done:
+        type: boolean
+      id:
+        type: integer
+    required:
+    - done
+    - id
+    type: object
+  training_sessions.UpdateTrainingSessionRequest:
+    properties:
+      done:
+        type: boolean
+      exercise_sessions:
+        items:
+          $ref: '#/definitions/training_sessions.UpdateExerciseSessionRequest'
+        type: array
+      id:
+        type: integer
+      requester_id:
+        type: string
+      seconds_count:
+        type: integer
+      step_count:
+        type: integer
+    required:
+    - done
+    - exercise_sessions
+    - requester_id
+    - seconds_count
+    - step_count
+    type: object
+  training_sessions.UpdateTrainingSessionResponse:
+    properties:
+      training_session:
+        $ref: '#/definitions/models.TrainingSession'
+    type: object
+  trainings.CreateTrainingRequest:
+    properties:
+      description:
+        type: string
+      difficulty:
+        type: string
+      duration:
+        type: integer
+      exercises:
+        items:
+          $ref: '#/definitions/trainings.ExerciseRequest'
+        type: array
+      name:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      trainer_id:
+        type: string
+    required:
+    - description
+    - difficulty
+    - duration
+    - exercises
+    - name
+    - trainer_id
+    type: object
+  trainings.CreateTrainingResponse:
+    properties:
+      training_plan:
+        $ref: '#/definitions/models.TrainingPlan'
+    type: object
+  trainings.DeleteTrainingRequest:
+    properties:
+      trainer_id:
+        type: string
+      trainingPlanID:
+        type: integer
+    required:
+    - trainer_id
+    type: object
+  trainings.ExerciseRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  trainings.GetTrainingsResponse:
+    properties:
+      pagination:
+        $ref: '#/definitions/contracts.Pagination'
+      trainings:
+        items:
+          $ref: '#/definitions/models.TrainingPlan'
+        type: array
+    type: object
+  trainings.UpdateTrainingRequest:
+    properties:
+      description:
+        type: string
+      difficulty:
+        type: string
+      duration:
+        type: integer
+      exercises:
+        items:
+          $ref: '#/definitions/trainings.ExerciseRequest'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      trainer_id:
+        type: string
+    required:
+    - description
+    - difficulty
+    - duration
+    - exercises
+    - name
+    - trainer_id
+    type: object
+  users.UserID:
+    properties:
+      user_id:
+        type: string
+    required:
+    - user_id
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: fiufit-trainings.fly.dev
+info:
+  contact: {}
+  description: Fiufit's Trainings service documentation. This service manages training
+    plans and its sessions, goals and reviews, etc.
+  title: Fiufit Trainings API
+  version: dev
+paths:
+  /{version}/goals:
+    get:
+      consumes:
+      - application/json
+      description: Get goals  with pagination filtered by their deadline, type, subtype
+        for a given userID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userID
+        required: true
+        type: string
+      - description: Goal Type
+        in: query
+        name: type
+        type: string
+      - description: Goal Subtype
+        in: query
+        name: subtype
+        type: string
+      - description: Goal Deadline
+        in: query
+        name: deadline
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/goals.GetGoalsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Get goals by different query params with pagination
+      tags:
+      - goals
+    post:
+      consumes:
+      - application/json
+      description: Creates a new training goal for a given userID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/goals.CreateGoalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.Goal'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Creates a new goal
+      tags:
+      - goals
+  /{version}/goals/{goalID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a goal for a given goalID, validating that the goal belongs
+        to the userID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Goal ID
+        in: path
+        name: goalID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/goals.DeleteGoalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Deletes a goal
+      tags:
+      - goals
+    get:
+      consumes:
+      - application/json
+      description: Gets a goal for a given goalID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Goal ID
+        in: path
+        name: goalID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.Goal'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Gets a goal by ID
+      tags:
+      - goals
+    patch:
+      consumes:
+      - application/json
+      description: Updates a goal for a given goalID, validating that the goal was
+        created by the user
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Goal ID
+        in: path
+        name: goalID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/goals.UpdateGoalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Updates a goal
+      tags:
+      - goals
+  /{version}/training_sessions:
+    get:
+      consumes:
+      - application/json
+      description: Gets all training sessions of a user for a given training plan
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userID
+        required: true
+        type: string
+      - description: Training Plan ID
+        in: query
+        name: trainingID
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/training_sessions.GetTrainingSessionsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Get training sessions
+      tags:
+      - training_sessions
+    post:
+      consumes:
+      - application/json
+      description: Creates a new review with a comment and a score for a given trainingPlanID
+        and userID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userID
+        required: true
+        type: string
+      - description: Training Plan ID
+        in: query
+        name: trainingID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/training_sessions.CreateTrainingSessionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Creates a new training session of a training plan
+      tags:
+      - training_sessions
+  /{version}/training_sessions{trainingSessionID}:
+    get:
+      consumes:
+      - application/json
+      description: Gets a training session by ID, validating that the requester has
+        access to it
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training Session ID
+        in: path
+        name: trainingSessionID
+        required: true
+        type: integer
+      - description: Requester User ID
+        in: query
+        name: requesterID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.TrainingSession'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Gets a training session by ID
+      tags:
+      - training_sessions
+    put:
+      consumes:
+      - application/json
+      description: Updates the progress of a training session, including the exercises
+        and the step and minutes count
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training Session ID
+        in: path
+        name: trainingSessionID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/training_sessions.UpdateTrainingSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/training_sessions.UpdateTrainingSessionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Updates a training session
+      tags:
+      - training_sessions
+  /{version}/trainings:
+    get:
+      consumes:
+      - application/json
+      description: Get training plans with pagination, optionally filtered by name,
+        description, difficulty, duration and tags
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Name
+        in: query
+        name: name
+        type: string
+      - description: Description
+        in: query
+        name: description
+        type: string
+      - description: Difficulty
+        in: query
+        name: difficulty
+        type: string
+      - description: Trainer ID
+        in: query
+        name: trainer_id
+        type: string
+      - description: Min Duration
+        in: query
+        name: min_duration
+        type: integer
+      - description: Max Duration
+        in: query
+        name: max_duration
+        type: integer
+      - collectionFormat: csv
+        description: Tags
+        in: query
+        items:
+          type: string
+        name: tags
+        type: array
+      - description: Disabled
+        in: query
+        name: disabled
+        type: boolean
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Page Size
+        in: query
+        name: page_size
+        type: integer
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/trainings.GetTrainingsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Get traning plans with pagination
+      tags:
+      - training_plans
+    post:
+      consumes:
+      - application/json
+      description: Creates a new training plan with a name, description, difficulty,
+        duration, exercises and tags
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/trainings.CreateTrainingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/trainings.CreateTrainingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Creates a new training plan
+      tags:
+      - training_plans
+  /{version}/trainings/{trainingID}/disable:
+    delete:
+      consumes:
+      - application/json
+      description: Disables a training plan that had been enabled previously (or had
+        never been disabled) given its ID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Disables a training plan
+      tags:
+      - training_plans
+  /{version}/trainings/{trainingID}/enable:
+    post:
+      consumes:
+      - application/json
+      description: Enables a training plan that had been disabled previously given
+        its ID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Enables a training plan
+      tags:
+      - training_plans
+  /{version}/trainings/{trainingID}/exercises:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new exercise for a given trainingID, validating the training
+        creator.
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: ID of the training to create the exercise for
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/exercises.CreateExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.Exercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Creates a new exercise
+      tags:
+      - exercises
+  /{version}/trainings/{trainingID}/exercises/{exerciseID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an exercise for a given trainingID and exerciseID, validating
+        the training creator.
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: ID of the training to delete the exercise from
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: ID of the exercise to delete
+        in: path
+        name: exerciseID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/exercises.DeleteExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Delete an exercise
+      tags:
+      - exercises
+    get:
+      consumes:
+      - application/json
+      description: Get an exercise for a given trainingID and exerciseID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: ID of the training to create the exercise for
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: ID of the exercise to delete
+        in: path
+        name: exerciseID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.Exercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Get exercise
+      tags:
+      - exercises
+    patch:
+      consumes:
+      - application/json
+      description: Update an exercise for a given trainingID and exerciseID, validating
+        the training creator
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: ID of the training to update the exercise from
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: ID of the exercise to delete
+        in: path
+        name: exerciseID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/exercises.UpdateExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.Exercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Update exercise
+      tags:
+      - exercises
+  /{version}/trainings/{trainingID}/favorites:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a training plan from favorites for a user given the training
+        plan ID and the user ID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/users.UserID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Removes a training plan from favorites
+      tags:
+      - training_plans
+    post:
+      consumes:
+      - application/json
+      description: Adds a training plan to favorites for a user given its ID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/users.UserID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Adds a training plan to favorites
+      tags:
+      - training_plans
+  /{version}/trainings/{trainingID}/reviews:
+    get:
+      consumes:
+      - application/json
+      description: Get reviews of a training plan with pagination filtered by their
+        score, comment or userID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training Plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: minimum score of the review
+        in: query
+        name: min_score
+        type: integer
+      - description: maximum score of the review
+        in: query
+        name: max_score
+        type: integer
+      - description: comment of the review
+        in: query
+        name: comment
+        type: string
+      - description: userID of the review
+        in: query
+        name: user_id
+        type: string
+      - description: page number when getting with pagination
+        in: query
+        name: page
+        type: integer
+      - description: page size when getting with pagination
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/reviews.GetReviewsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Get reviews by different query params with pagination
+      tags:
+      - reviews
+    post:
+      consumes:
+      - application/json
+      description: Creates a new review with a comment and a score for a given trainingPlanID
+        and userID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training Plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/reviews.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.Review'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Creates a review for a training plan
+      tags:
+      - reviews
+  /{version}/trainings/{trainingID}/reviews/{reviewID}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a review for a given reviewID and trainingID given by the
+        userID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training Plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Review ID
+        in: path
+        name: reviewID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/reviews.DeleteReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Deletes a review
+      tags:
+      - reviews
+    get:
+      consumes:
+      - application/json
+      description: Gets a review for a given reviewID
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training Plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Review ID
+        in: path
+        name: reviewID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.Review'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Gets a review by ID
+      tags:
+      - reviews
+    patch:
+      consumes:
+      - application/json
+      description: Updates the comment and/or rating of a review given by a user for
+        a training plan
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training Plan ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Review ID
+        in: path
+        name: reviewID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/reviews.UpdateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Updates a review
+      tags:
+      - reviews
+  /{version}/trainings/favorites:
+    get:
+      consumes:
+      - application/json
+      description: Gets favorite training plans for a user with pagination
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Page Size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Gets favorite training plans for a user
+      tags:
+      - training_plans
+  /{version}/trainings{training_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a training plan for a given trainingID and validates that
+        the user has permissions to do so
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/trainings.DeleteTrainingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Deletes a training plan
+      tags:
+      - training_plans
+    put:
+      consumes:
+      - application/json
+      description: Updates a training plan with a name, description, difficulty, duration,
+        exercises and tags
+      parameters:
+      - description: API Version
+        in: path
+        name: version
+        required: true
+        type: string
+      - description: Training ID
+        in: path
+        name: trainingID
+        required: true
+        type: integer
+      - description: Body params
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/trainings.UpdateTrainingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Important Note: OK responses are wrapped in {"data": ... }'
+          schema:
+            $ref: '#/definitions/models.TrainingPlan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/contracts.ErrResponse'
+      summary: Updates a training plan
+      tags:
+      - training_plans
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

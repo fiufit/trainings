@@ -19,6 +19,21 @@ func NewUpdateGoal(goals ugoals.GoalUpdater, logger *zap.Logger) UpdateGoal {
 	return UpdateGoal{goals: goals, logger: logger}
 }
 
+// Update goal godoc
+//	@Summary		Updates a goal
+//	@Description	Updates a goal for a given goalID, validating that the goal was created by the user
+//	@Tags			goals
+//	@Accept			json
+//	@Produce		json
+//	@Param			version					path		string							true	"API Version"
+// 	@Param			goalID					path		uint								true	"Goal ID"
+//	@Param			payload					body		goals.UpdateGoalRequest	true	"Body params"
+//	@Success		200						{object}	string	"Important Note: OK responses are wrapped in {"data": ... }"
+//	@Failure		400						{object}	contracts.ErrResponse
+// 	@Failure		401						{object}	contracts.ErrResponse
+//	@Failure		404						{object}	contracts.ErrResponse
+//	@Failure		500						{object}	contracts.ErrResponse
+//	@Router			/{version}/goals/{goalID} 	[patch]
 func (h UpdateGoal) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req goals.UpdateGoalRequest

@@ -19,6 +19,21 @@ func NewCreateExercise(exercises uexercises.ExerciseCreator, logger *zap.Logger)
 	return CreateExercise{exercises: exercises, logger: logger}
 }
 
+// Create exercise godoc
+//	@Summary		Creates a new exercise
+//	@Description	Creates a new exercise for a given trainingID, validating the training creator.
+//	@Tags			exercises
+//	@Accept			json
+//	@Produce		json
+//	@Param			version					path		string							true	"API Version"
+// 	@Param			trainingID				path		uint							true	"ID of the training to create the exercise for"
+//	@Param			payload					body		exercises.CreateExerciseRequest	true	"Body params"
+//	@Success		200						{object}	models.Exercise	"Important Note: OK responses are wrapped in {"data": ... }"
+//	@Failure		400						{object}	contracts.ErrResponse
+//	@Failure		401						{object}	contracts.ErrResponse
+//	@Failure		404						{object}	contracts.ErrResponse
+//	@Failure		500						{object}	contracts.ErrResponse
+//	@Router			/{version}/trainings/{trainingID}/exercises 	[post]
 func (h CreateExercise) Handle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req exercises.CreateExerciseRequest
